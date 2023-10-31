@@ -9,7 +9,7 @@ Summary: The Berkeley DB database compatibility library
 Name: compat-db
 Version: %{main_version}
 Release: 28%{?dist}
-Source0: http://download.oracle.com/berkeley-db/db-%{db47_version}.tar.gz
+Source0: https://download.oracle.com/berkeley-db/db-%{db47_version}.tar.gz
 # license text extracted from tarball
 Source1: LICENSE
 
@@ -18,13 +18,13 @@ Patch5: db-4.6.21-1.85-compat.patch
 Patch6: compat-db-cppcheck-warnings.patch
 
 # Upstream db-4.7.25 patches
-Patch50: http://www.oracle.com/technology/products/berkeley-db/db/update/%{db47_version}/patch.4.7.25.1
-Patch51: http://www.oracle.com/technology/products/berkeley-db/db/update/%{db47_version}/patch.4.7.25.2
-Patch52: http://www.oracle.com/technology/products/berkeley-db/db/update/%{db47_version}/patch.4.7.25.3
-Patch53: http://www.oracle.com/technology/products/berkeley-db/db/update/%{db47_version}/patch.4.7.25.4
+Patch50: https://www.oracle.com/technology/products/berkeley-db/db/update/%{db47_version}/patch.4.7.25.1
+Patch51: https://www.oracle.com/technology/products/berkeley-db/db/update/%{db47_version}/patch.4.7.25.2
+Patch52: https://www.oracle.com/technology/products/berkeley-db/db/update/%{db47_version}/patch.4.7.25.3
+Patch53: https://www.oracle.com/technology/products/berkeley-db/db/update/%{db47_version}/patch.4.7.25.4
 
 
-URL: http://www.oracle.com/database/berkeley-db/
+URL: https://www.oracle.com/database/berkeley-db/
 License: BSD
 Group: System Environment/Libraries
 BuildRequires: findutils, libtool, perl, sed, ed, rpcgen, libtirpc-devel
