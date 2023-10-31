@@ -1,0 +1,26 @@
+# Sanity fix for cppcheck warnings
+
+diff -up compat-db-4.7.25/db-4.7.25/qam/qam_stat.c.old compat-db-4.7.25/db-4.7.25/qam/qam_stat.c
+--- compat-db-4.7.25/db-4.7.25/qam/qam_stat.c.old	2014-03-26 11:39:14.653022479 +0100
++++ compat-db-4.7.25/db-4.7.25/qam/qam_stat.c	2014-03-26 11:40:09.981228567 +0100
+@@ -36,7 +36,7 @@ __qam_stat(dbc, spp, flags)
+ 	QAMDATA *qp, *ep;
+ 	QMETA *meta;
+ 	QUEUE *t;
+-	db_indx_t indx;
++	db_indx_t indx = 0;
+ 	db_pgno_t first, last, pgno, pg_ext, stop;
+ 	u_int32_t re_len;
+ 	int ret, t_ret;
+diff -up compat-db-4.7.25/db-4.7.25/repmgr/repmgr_posix.c.old compat-db-4.7.25/db-4.7.25/repmgr/repmgr_posix.c
+--- compat-db-4.7.25/db-4.7.25/repmgr/repmgr_posix.c.old	2014-03-26 11:36:30.164404044 +0100
++++ compat-db-4.7.25/db-4.7.25/repmgr/repmgr_posix.c	2014-03-26 11:36:39.083437596 +0100
+@@ -534,7 +534,7 @@ __repmgr_select_loop(env)
+ 	struct timeval select_timeout, *select_timeout_p;
+ 	DB_REP *db_rep;
+ 	REPMGR_CONNECTION *conn, *next;
+-	db_timespec timeout;
++	db_timespec timeout = {.tv_sec = 0, .tv_nsec = 0};
+ 	fd_set reads, writes;
+ 	int ret, flow_control, maxfd;
+ 	u_int8_t buf[10];	/* arbitrary size */
