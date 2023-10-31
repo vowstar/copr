@@ -12,8 +12,8 @@ Source0:	%{url}/archive/upstream/%{version}/%{name}-upstream-%{version}.tar.gz
 Patch0:     0001-Fix-broken-cron-scripts.patch
 Patch1:     0002-Found-a-way-to-exec-the-process-and-yet-have-it-work.patch
 
-#BuildRequires:
-#Requires:
+BuildRequires:	gcc, gcc-c++, glibc-devel, make
+Requires: glibc
 
 %description
 An alternative implementation of the zfs-auto-snapshot service for Linux
