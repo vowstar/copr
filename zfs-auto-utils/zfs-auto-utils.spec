@@ -8,7 +8,7 @@ Summary:	ZFS Automatic Scrub/Trim for Linux
 Group:		Applications/System
 License:	GPL2
 URL:		https://github.com/vowstar/%{name}
-Source0:	%{url}/archive/%{name}-%{version}.tar.gz
+Source0:	%{url}/archive/%{version}.tar.gz
 
 BuildRequires:	make
 # Requires:
