@@ -30,7 +30,9 @@ BuildRequires:  perl(Pod::Usage)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(Time::HiRes)
 BuildRequires:  perl(vars)
+%if (0%{?fedora} >= 7) || (0%{?rhel} >= 7) || (0%{?epel} >= 7) || (0%{?centos} >= 7)
 BuildRequires:  python3-devel
+%endif
 BuildRequires:  sed
  
 # required for further tests
