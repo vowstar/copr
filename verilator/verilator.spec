@@ -17,8 +17,10 @@ BuildRequires:  help2man
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+%if (0%{?fedora} >= 9) || (0%{?rhel} >= 9) || (0%{?epel} >= 9) || (0%{?centos} >= 9)
 BuildRequires:  perl-lib
 BuildRequires:  perl-version
+%endif
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Digest::MD5)
 BuildRequires:  perl(FindBin)
