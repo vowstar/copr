@@ -43,7 +43,7 @@ Requires:       %{name} = %{version}-%{release}
 Python bindings for %{name} library
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -n slang-%{version}
 
 # python destination
 sed -i 's|DESTINATION .)|DESTINATION ${Python_SITEARCH})|' bindings/CMakeLists.txt
