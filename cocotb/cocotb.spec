@@ -1,4 +1,3 @@
-%global debug_package %{nil}
 Name:           cocotb
 Version:        1.8.1
 Release:        1%{?dist}

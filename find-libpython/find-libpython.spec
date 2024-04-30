@@ -1,3 +1,4 @@
+%global debug_package %{nil}
 Name:           find-libpython
 Version:        0.4.0
 Release:        1%{?dist}
