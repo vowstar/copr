@@ -9,7 +9,7 @@ Source0:        https://github.com/MikePopoloski/slang/archive/v%{version}.tar.g
 
 BuildRequires:  git cmake doxygen
 BuildRequires:  python3 python3-devel python3-setuptools
-%if ! (0%{?rhel} || (0%{?fedora} > 34 && 0%{?fedora} < 37))
+%if ! (0%{?rhel} || 0%{?openeuler} || (0%{?fedora} > 34 && 0%{?fedora} < 37))
 BuildRequires:  fmt-devel catch-devel pybind11-devel
 %endif
 %if 0%{?rhel} == 8
