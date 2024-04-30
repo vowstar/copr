@@ -19,12 +19,12 @@ BuildRequires: readline-devel
 BuildRequires: zlib-devel
 BuildRequires: make
 
- 
+
 %description
 Icarus Verilog is a Verilog compiler that generates a variety of
 engineering formats, including simulation. It strives to be true
 to the IEEE-1364 standard.
- 
+
 %prep
 %autosetup -n %{name}-%{uver}
 # Clean junks from tarball
@@ -40,7 +40,7 @@ export CPPFLAGS="$CPPFLAGS -fcommon"
 # use make, avoid use V=1 due https://github.com/steveicarus/iverilog/issues/262
 make %{?_smp_mflags}
 
- 
+
 %install
 %{__make}    prefix=%{buildroot}%{_prefix} \
              bindir=%{buildroot}%{_bindir} \
@@ -51,11 +51,11 @@ make %{?_smp_mflags}
              vpidir=%{buildroot}%{_libdir}/ivl/ \
              INSTALL="install -p" \
 install
- 
+
 %check
 make check
- 
- 
+
+
 %files
 %doc BUGS.txt QUICK_START.txt
 %doc ieee1364-notes.txt mingw.txt swift.txt netlist.txt
