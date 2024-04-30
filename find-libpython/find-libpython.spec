@@ -34,7 +34,7 @@ interpreter into another process, or Python library build systems.
 
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -n find_libpython-%{version}
 
 %build
 %py3_build
