@@ -1,5 +1,5 @@
 Name:           verilator
-Version:        5.020
+Version:        5.022
 Release:        1%{?dist}
 
 Summary:        A fast simulator for synthesizable Verilog
