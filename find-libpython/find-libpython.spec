@@ -39,16 +39,14 @@ interpreter into another process, or Python library build systems.
 %build
 %py3_build
 
-
 %install
 %py3_install
-
 
 %files python3
 %license LICENSE
 %doc README.md
 %{_bindir}/*
-%{python3_sitearch}/*
+%{python3_sitelib}/*
 
 
 %changelog
