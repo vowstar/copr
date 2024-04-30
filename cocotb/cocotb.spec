@@ -22,7 +22,7 @@ for writing VHDL and Verilog testbenches in Python.
 
 
 %prep
-%autosetup -n %{cocotb}-%{version}
+%autosetup -n %{name}-%{version}
 
 %build
 sed -i '/-rpath/d' cocotb_build_libs.py
