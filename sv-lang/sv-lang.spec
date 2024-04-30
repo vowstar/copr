@@ -5,7 +5,7 @@ Summary:        SystemVerilog compiler and language services
 License:        MIT
 
 URL:            https://github.com/MikePopoloski/slang
-Source0:        https://github.com/MikePopoloski/slang/archive/v${version}.tar.gz
+Source0:        https://github.com/MikePopoloski/slang/archive/v%{version}.tar.gz
 
 BuildRequires:  git cmake doxygen
 BuildRequires:  python3 python3-devel python3-setuptools
