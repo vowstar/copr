@@ -1,5 +1,5 @@
 Name:           sv-lang
-Version:        5.0
+Version:        6.0
 Release:        1%{?dist}
 Summary:        SystemVerilog compiler and language services
 License:        MIT
