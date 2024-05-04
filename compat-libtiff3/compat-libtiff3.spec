@@ -70,13 +70,13 @@ image files using the libtiff library.
 %prep
 %setup -q -n tiff-%{version}
 
-%patch 1 -p1
-%patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1
-%patch 5 -p1
-%patch 6 -p1
-%patch 7 -p1
+%patch -P 1 -p1
+%patch -P 2 -p1
+%patch -P 3 -p1
+%patch -P 4 -p1
+%patch -P 5 -p1
+%patch -P 6 -p1
+%patch -P 7 -p1
 
 # Use build system's libtool.m4, not the one in the package.
 rm -f libtool.m4
