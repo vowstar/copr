@@ -8,7 +8,8 @@ License: libtiff
 Group: System Environment/Libraries
 URL: http://www.remotesensing.org/libtiff/
 
-Source: ftp://ftp.remotesensing.org/pub/libtiff/tiff-%{version}.tar.gz
+Source: https://download.osgeo.org/libtiff/tiff-%{version}.tar.gz
+#Source: ftp://ftp.remotesensing.org/pub/libtiff/tiff-%{version}.tar.gz
 
 Patch1: libtiff-CVE-2012-4447.patch
 Patch2: libtiff-CVE-2012-4564.patch
