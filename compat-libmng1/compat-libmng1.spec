@@ -1,4 +1,4 @@
-Name: libmng1
+Name: compat-libmng1
 %global oname libmng
 Version: 1.0.10
 Release: 13%{?dist}
@@ -6,7 +6,8 @@ URL: http://www.libmng.com/
 Summary: Library for Multiple-image Network Graphics support
 # This is a common zlib variant.
 License: zlib
-Source0: http://download.sourceforge.net/sourceforge/%{oname}/%{oname}-%{version}.tar.gz
+Source0: https://versaweb.dl.sourceforge.net/project/%{oname}/%{oname}-devel/%{version}/%{oname}-%{version}.tar.gz
+#Source0: https://download.sourceforge.net/sourceforge/%{oname}/%{oname}-%{version}.tar.gz
 Group: System Environment/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildRequires: zlib-devel
