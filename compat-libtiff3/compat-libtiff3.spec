@@ -23,6 +23,14 @@ BuildRoot: %{_tmppath}/%{oname}-%{version}-%{release}-root
 BuildRequires: zlib-devel libjpeg-devel
 BuildRequires: libtool automake autoconf
 
+%global toolchain gcc
+
+%if "%{toolchain}" == "gcc"
+BuildRequires:  gcc-c++
+%else
+BuildRequires:  clang
+%endif
+
 %global LIBVER %(echo %{version} | cut -f 1-2 -d .)
 
 %description
