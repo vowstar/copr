@@ -12,7 +12,11 @@ Group: System Environment/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildRequires: zlib-devel
 BuildRequires: libjpeg-devel
+%if (0%{?fedora} >= 7) || (0%{?rhel} >= 7) || (0%{?epel} >= 7) || (0%{?centos} >= 7)
+BuildRequires: lcms2-devel
+%else
 BuildRequires: lcms-devel
+%endif
 BuildRequires: libtool
 BuildRequires: autoconf
 
