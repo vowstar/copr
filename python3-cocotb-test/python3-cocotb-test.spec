@@ -1,5 +1,4 @@
 %global pypi_name cocotb-test
-%global oname cocotb_test
 %global debug_package %{nil}
 Name:           python3-%{pypi_name}
 Version:        0.2.5
@@ -34,7 +33,7 @@ allow to use pytest-xdist or pytest-parallel for parallel runs
 Provides:       %{pypi_name}
 
 %prep
-%autosetup -n %{oname}-%{version}
+%autosetup -n %{pypi_name}-%{version}
 
 %build
 %py3_build
