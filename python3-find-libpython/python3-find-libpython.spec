@@ -1,4 +1,5 @@
 %global pypi_name find-libpython
+%global oname find_libpython
 %global debug_package %{nil}
 Name:           python3-%{pypi_name}
 Version:        0.4.0
@@ -38,7 +39,7 @@ interpreter into another process, or Python library build systems.
 Provides:       %{pypi_name}
 
 %prep
-%autosetup -n find_libpython-%{version}
+%autosetup -n %{oname}-%{version}
 
 %build
 %py3_build
