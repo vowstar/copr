@@ -32,6 +32,8 @@ Provides:       cocotb
 sed -i 's|"-static-libstdc++"||g' cocotb_build_libs.py
 sed -i 's|echo "acc.*|echo "acc+=rw,wn,cbk:*" > $@|g' cocotb/share/makefiles/simulators/Makefile.vcs
 sed -i 's|+acc+1|-debug_access+all -debug_region+cell+encrypt -debug_region+cell+lib|g' cocotb/share/makefiles/simulators/Makefile.vcs
+sed -i 's|-debug -load|-load|g' cocotb/share/makefiles/simulators/Makefile.vcs
+
 %py3_build
 
 
