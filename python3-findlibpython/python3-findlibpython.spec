@@ -12,15 +12,7 @@ BuildRequires:  git gcc-c++ make python3-devel python3-setuptools
 
 BuildArch:      noarch
 
-%description
-A pypi project version of this gist, which also appears within the PyCall
-library.
-The library is designed to find the path to the libpython dynamic library for
-the current Python environment. It should work with many types of installations,
-whether it be conda-managed, system-managed, or otherwise. And it should
-function on Windows, Mac OS/OS X, and any Linux distribution.
-This code is useful in several contexts, including projects that embed a Python
-interpreter into another process, or Python library build systems.
+%{?python_provide:%python_provide python3-%{pypi_name}}
 
 %description
 A pypi project version of this gist, which also appears within the PyCall
@@ -33,7 +25,7 @@ This code is useful in several contexts, including projects that embed a Python
 interpreter into another process, or Python library build systems.
 
 %package -n %{pypi_name}
-
+Summary:        %{summary}
 %description -n %{pypi_name}
 A pypi project version of this gist, which also appears within the PyCall
 library.
@@ -43,10 +35,7 @@ whether it be conda-managed, system-managed, or otherwise. And it should
 function on Windows, Mac OS/OS X, and any Linux distribution.
 This code is useful in several contexts, including projects that embed a Python
 interpreter into another process, or Python library build systems.
-
-Summary:        %{summary}
-Provides:       find-libpython
-%{?python_provide:%python_provide python3-%{pypi_name}}
+Provides:       %{pypi_name}
 
 %prep
 %autosetup -n find_libpython-%{version}
