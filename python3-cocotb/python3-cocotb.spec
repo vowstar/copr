@@ -29,9 +29,11 @@ Provides:       cocotb
 %prep
 %autosetup -n %{pypi_name}-%{version}
 
-pushd %{pypi_name}-%{version}
+# for debugging's sake
+pwd
+ls
+
 %patch -P 1 -p1
-popd
 
 %build
 #sed -i '/-rpath/d' cocotb_build_libs.py
