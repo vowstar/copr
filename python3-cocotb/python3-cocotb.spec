@@ -9,6 +9,7 @@ Source0:        https://github.com/cocotb/cocotb/archive/v%{version}.tar.gz
 
 BuildRequires:  git gcc-c++ make python3-devel python3-setuptools
 Requires:       python3dist(setuptools)
+Requires:       python3dist(pytest)
 
 %description
 Cocotb is a coroutine based cosimulation library
