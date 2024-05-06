@@ -22,11 +22,6 @@ function on Windows, Mac OS/OS X, and any Linux distribution.
 This code is useful in several contexts, including projects that embed a Python
 interpreter into another process, or Python library build systems.
 
-%package -n     python3-%{pypi_name}
-Summary:        %{summary}
-Provides:       find-libpython
-%{?python_provide:%python_provide python3-%{pypi_name}}
-
 %description
 A pypi project version of this gist, which also appears within the PyCall
 library.
@@ -37,7 +32,9 @@ function on Windows, Mac OS/OS X, and any Linux distribution.
 This code is useful in several contexts, including projects that embed a Python
 interpreter into another process, or Python library build systems.
 
-%description -n python3-%{pypi_name}
+%package -n %{pypi_name}
+
+%description -n %{pypi_name}
 A pypi project version of this gist, which also appears within the PyCall
 library.
 The library is designed to find the path to the libpython dynamic library for
@@ -46,6 +43,10 @@ whether it be conda-managed, system-managed, or otherwise. And it should
 function on Windows, Mac OS/OS X, and any Linux distribution.
 This code is useful in several contexts, including projects that embed a Python
 interpreter into another process, or Python library build systems.
+
+Summary:        %{summary}
+Provides:       find-libpython
+%{?python_provide:%python_provide python3-%{pypi_name}}
 
 %prep
 %autosetup -n find_libpython-%{version}
