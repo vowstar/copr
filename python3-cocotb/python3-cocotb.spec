@@ -7,8 +7,6 @@ License:        BSD
 URL:            https://cocotb.org
 Source0:        https://github.com/cocotb/cocotb/archive/v%{version}.tar.gz
 
-Patch1: 0001-Fix-vcs-compile-options-and-pli.tab.patch
-
 BuildRequires:  git gcc-c++ make python3-devel python3-setuptools
 Requires:       python3dist(setuptools)
 Requires:       python3dist(pytest)
