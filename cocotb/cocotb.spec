@@ -1,4 +1,5 @@
-Name:           cocotb
+%global pypi_name cocotb
+Name:           python3-%{pypi_name}
 Version:        1.8.1
 Release:        1%{?dist}
 Summary:        Coroutine based cosimulation library for writing VHDL and Verilog
@@ -13,23 +14,22 @@ Requires:       python3dist(setuptools)
 Cocotb is a coroutine based cosimulation library
 for writing VHDL and Verilog testbenches in Python.
 
-%package        python3
-Summary:        %{summary}
-Provides:       cocotb
+%package -n     python3-%{pypi_name}
 
+%description -n python3-%{pypi_name}
+cocotb is a coroutine based cosimulation library for writing VHDL
+and Verilog testbenches in Python.
+
+Summary:       %{summary}
+Provides:       cocotb = %{version}-%{release}
 %{?python_provide:%python_provide python3-%{name}}
-
-%description    python3
-Cocotb is a coroutine based cosimulation library
-for writing VHDL and Verilog testbenches in Python.
-
 
 %prep
 %autosetup -n %{name}-%{version}
 
 %build
-sed -i '/-rpath/d' cocotb_build_libs.py
-sed -i 's|"-static-libstdc++"||g' cocotb_build_libs.py
+#sed -i '/-rpath/d' cocotb_build_libs.py
+#sed -i 's|"-static-libstdc++"||g' cocotb_build_libs.py
 %py3_build
 
 
