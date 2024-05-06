@@ -33,7 +33,7 @@ Provides:       cocotb
 pwd
 ls
 
-%patch -P 1 -p1
+%patch -P 1 -p1 -b .build~
 
 %build
 #sed -i '/-rpath/d' cocotb_build_libs.py
