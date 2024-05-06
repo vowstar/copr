@@ -36,11 +36,10 @@ Provides:       cocotb
 %py3_install
 
 
-%files python3
+%files -n python3-%{pypi_name}
 %license LICENSE
 %doc README.md
 %{_bindir}/*
 %{python3_sitearch}/*
-
 
 %changelog
