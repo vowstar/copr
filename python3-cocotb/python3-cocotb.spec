@@ -7,8 +7,7 @@ License:        BSD
 URL:            https://cocotb.org
 Source0:        https://github.com/cocotb/cocotb/archive/v%{version}.tar.gz
 
-BuildRequires:  git gcc-c++ libstdc++ make python3-devel python3-setuptools
-Requires:       libstdc++
+BuildRequires:  git gcc-c++ make python3-devel python3-setuptools
 Requires:       python3dist(setuptools)
 Requires:       python3dist(pytest)
 
@@ -30,7 +29,7 @@ Provides:       cocotb
 
 %build
 #sed -i '/-rpath/d' cocotb_build_libs.py
-#sed -i 's|"-static-libstdc++"||g' cocotb_build_libs.py
+sed -i 's|"-static-libstdc++"||g' cocotb_build_libs.py
 %py3_build
 
 
