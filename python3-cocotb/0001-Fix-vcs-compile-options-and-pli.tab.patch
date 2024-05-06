@@ -1,0 +1,33 @@
+From a791e47e42e6fb43f42b0e5bea06a9e6b038b712 Mon Sep 17 00:00:00 2001
+From: Huang Rui <vowstar@gmail.com>
+Date: Mon, 6 May 2024 13:54:13 +0800
+Subject: [PATCH] Fix vcs compile options and pli.tab
+
+Signed-off-by: Huang Rui <vowstar@gmail.com>
+---
+ cocotb/share/makefiles/simulators/Makefile.vcs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cocotb/share/makefiles/simulators/Makefile.vcs b/cocotb/share/makefiles/simulators/Makefile.vcs
+index 1b56bb0d95fc..e5eb8e9e5f22 100644
+--- a/cocotb/share/makefiles/simulators/Makefile.vcs
++++ b/cocotb/share/makefiles/simulators/Makefile.vcs
+@@ -71,13 +71,13 @@ endif
+ # Can't do this using an argument, we have to create a PLI table file
+ # enabling write access to the design
+ $(SIM_BUILD)/pli.tab : | $(SIM_BUILD)
+-	echo "acc+=rw,wn:*" > $@
++	echo "acc+=rw,wn,cbk:*" > $@
+ 
+ # Compilation phase
+ $(SIM_BUILD)/simv: $(VERILOG_SOURCES) $(SIM_BUILD)/pli.tab $(CUSTOM_COMPILE_DEPS) | $(SIM_BUILD)
+ 	cd $(SIM_BUILD) && \
+ 	TOPLEVEL=$(TOPLEVEL) \
+-	$(CMD) -top $(TOPLEVEL) $(PLUSARGS) +acc+1 +vpi -P pli.tab +define+COCOTB_SIM=1 -sverilog \
++	$(CMD) -top $(TOPLEVEL) $(PLUSARGS) -debug_access+all -debug_region+cell+encrypt -debug_region+cell+lib +vpi -P pli.tab +define+COCOTB_SIM=1 -sverilog \
+ 	-timescale=$(COCOTB_HDL_TIMEUNIT)/$(COCOTB_HDL_TIMEPRECISION) \
+ 	$(EXTRA_ARGS) -debug -load $(shell cocotb-config --lib-name-path vpi vcs) $(COMPILE_ARGS) $(VERILOG_SOURCES)
+ 
+-- 
+2.45.0
+
