@@ -1,17 +1,5 @@
-From a791e47e42e6fb43f42b0e5bea06a9e6b038b712 Mon Sep 17 00:00:00 2001
-From: Huang Rui <vowstar@gmail.com>
-Date: Mon, 6 May 2024 13:54:13 +0800
-Subject: [PATCH] Fix vcs compile options and pli.tab
-
-Signed-off-by: Huang Rui <vowstar@gmail.com>
----
- cocotb/share/makefiles/simulators/Makefile.vcs | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/cocotb/share/makefiles/simulators/Makefile.vcs b/cocotb/share/makefiles/simulators/Makefile.vcs
-index 1b56bb0d95fc..e5eb8e9e5f22 100644
---- a/cocotb/share/makefiles/simulators/Makefile.vcs
-+++ b/cocotb/share/makefiles/simulators/Makefile.vcs
+--- python3-cocotb-1.8.1/cocotb/share/makefiles/simulators/Makefile.vcs.orig
++++ python3-cocotb-1.8.1/cocotb/share/makefiles/simulators/Makefile.vcs
 @@ -71,13 +71,13 @@ endif
  # Can't do this using an argument, we have to create a PLI table file
  # enabling write access to the design
