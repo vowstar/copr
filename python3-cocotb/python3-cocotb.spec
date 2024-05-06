@@ -25,7 +25,7 @@ Provides:       cocotb = %{version}-%{release}
 %{?python_provide:%python_provide python3-%{name}}
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -n %{pypi_name}-%{version}
 
 %build
 #sed -i '/-rpath/d' cocotb_build_libs.py
