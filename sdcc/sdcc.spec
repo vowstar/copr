@@ -14,6 +14,7 @@ BuildRequires:  bison, gcc-c++, automake, libtool
 BuildRequires:  boost-devel zlib-devel
 BuildRequires:  flex
 Buildrequires:  gputils
+BuildRequires:  /usr/bin/python3 gdb-headless
 Provides:       bundled(libiberty)
 Requires:       emacs-filesystem
 Obsoletes:      emacs-sdcc <= 3.6.0
