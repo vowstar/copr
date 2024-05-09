@@ -69,13 +69,13 @@ This package contains Berkeley DB library version %{db47_version} used for compa
 %setup -q -c
 
 pushd db-%{db47_version}
-%patch50 -p0 -b .sequence
-%patch51 -p0 -b .deadlock
-%patch52 -p0 -b .dd-segfaults
-%patch53 -p1 -b .java-api
-%patch3 -p1 -b .sparc64
-%patch5 -p1 -b .compat
-%patch6 -p2 -b .cppcheck-warn
+%patch -P 50 -p0 -b .sequence
+%patch -P 51 -p0 -b .deadlock
+%patch -P 52 -p0 -b .dd-segfaults
+%patch -P 53 -p1 -b .java-api
+%patch -P 3 -p1 -b .sparc64
+%patch -P 5 -p1 -b .compat
+%patch -P 6 -p2 -b .cppcheck-warn
 popd
 
 mkdir docs

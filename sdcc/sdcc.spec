@@ -41,7 +41,7 @@ if you want to modify the C library or as reference of how it works.
 %setup -q -n sdcc-%{version}
 #%setup -q -n sdcc
 find -name '*.{c,h,cc}' -a -perm -a=x -exec chmod -a=x '{}' \;
-%patch1 -p1
+%patch -P 1 -p1
 # Disable brp-strip-static-archive for now because it errors trying to
 # strip foreign binaries.
 echo '%{__os_install_post}'

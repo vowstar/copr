@@ -30,8 +30,8 @@ the zfs utilities and cron, and can run in the dash shell.
 
 %prep
 %setup -q -n %{name}-upstream-%{version}
-#%patch0 -p1
-#%patch1 -p1
+#%patch -P 0 -p1
+#%patch -P 1 -p1
 sed -i s@/usr/local@/usr@ Makefile
 
 
