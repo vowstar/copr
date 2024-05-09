@@ -15,6 +15,7 @@ BuildRequires:  boost-devel zlib-devel
 BuildRequires:  flex
 Buildrequires:  gputils
 BuildRequires:  /usr/bin/python3 gdb-headless
+BuildRequires:  texinfo
 Provides:       bundled(libiberty)
 Requires:       emacs-filesystem
 Obsoletes:      emacs-sdcc <= 3.6.0
