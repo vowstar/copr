@@ -7,7 +7,6 @@ URL:            http://sdcc.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/project/%{name}/sdcc/%{version}/%{name}-src-%{version}.tar.bz2
 #Source0:        http://downloads.sourceforge.net/sdcc/sdcc-src-%{version}.tar.bz2
 Source1:        README.fedora
-Source2:        sdcc-%{version}-lyx-preferences
 Patch1:         sdcc-%{version}-python3.patch
 
 BuildRequires: make
@@ -15,12 +14,6 @@ BuildRequires:  bison, gcc-c++, automake, libtool
 BuildRequires:  boost-devel zlib-devel
 BuildRequires:  flex
 Buildrequires:  gputils
-BuildRequires:  lyx inkscape ghostscript
-BuildRequires:  latex2html
-BuildRequires:  tex(ulem.sty) tex-preview
-BuildRequires:  texinfo texlive-xetex texlive-footnotehyper texlive-epstopdf
-# Work around to lyx-common missing R: /usr/bin/python
-BuildRequires:  /usr/bin/python3 gdb-headless
 Provides:       bundled(libiberty)
 Requires:       emacs-filesystem
 Obsoletes:      emacs-sdcc <= 3.6.0
@@ -51,7 +44,7 @@ find -name '*.{c,h,cc}' -a -perm -a=x -exec chmod -a=x '{}' \;
 # Disable brp-strip-static-archive for now because it errors trying to
 # strip foreign binaries.
 echo '%{__os_install_post}'
-%global __os_install_post %(echo '%{__os_install_post}' | 
+%global __os_install_post %(echo '%{__os_install_post}' |
         sed -e 's#/usr/lib/rpm.*/brp-strip-static-archive .*##g' |
         sed -e 's#/usr/lib/rpm.*/brp-strip-lto .*##g')
 
@@ -60,16 +53,12 @@ echo '%{__os_install_post}'
 # Preset PDFOPT to /bin/cp
 OPTS='PDFOPT="/bin/cp"'
 
-%configure --enable-doc --disable-non-free  STRIP=: ${OPTS} PYTHON=python3
-mkdir -p ~/.lyx
-cp %SOURCE2  ~/.lyx/preferences
+%configure --disable-doc --disable-non-free  STRIP=: ${OPTS} PYTHON=python3
 %{__make} Q= QUIET=
 
 
 %install
 make install DESTDIR=$RPM_BUILD_ROOT Q=
-mv $RPM_BUILD_ROOT%{_datadir}/doc installed-docs
-install -m 644 %SOURCE1 installed-docs
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/emacs/site-lisp/%{name}
 mv $RPM_BUILD_ROOT%{_bindir}/*.el $RPM_BUILD_ROOT%{_datadir}/emacs/site-lisp/%{name}
 find $RPM_BUILD_ROOT -type f -name \*.c -exec chmod a-x '{}' \;
@@ -93,7 +82,6 @@ popd
 
 
 %files
-%doc installed-docs/*
 %{_bindir}/*
 %{_libexecdir}/%{name}
 %{_datadir}/%{name}
