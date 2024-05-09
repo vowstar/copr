@@ -1,3 +1,4 @@
+%undefine _configure_use_runstatedir
 Name:           sdcc
 Version:        4.2.0
 Release:        1%{?dist}
