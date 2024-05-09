@@ -63,6 +63,7 @@ OPTS='PDFOPT="/bin/cp"'
 
 %install
 make install DESTDIR=$RPM_BUILD_ROOT Q=
+mv $RPM_BUILD_ROOT%{_datadir}/doc installed-docs
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/emacs/site-lisp/%{name}
 mv $RPM_BUILD_ROOT%{_bindir}/*.el $RPM_BUILD_ROOT%{_datadir}/emacs/site-lisp/%{name}
 find $RPM_BUILD_ROOT -type f -name \*.c -exec chmod a-x '{}' \;
@@ -86,6 +87,7 @@ popd
 
 
 %files
+%doc installed-docs/*
 %{_bindir}/*
 %{_libexecdir}/%{name}
 %{_datadir}/%{name}
