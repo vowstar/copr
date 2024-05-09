@@ -2,7 +2,7 @@
 %undefine _configure_use_runstatedir
 Name:           sdcc
 Version:        4.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Small Device C Compiler
 License:        GPLv2+
 URL:            http://sdcc.sourceforge.net/
@@ -79,6 +79,12 @@ PATH=/usr/libexec/sdcc:\$PATH
 /usr/libexec/%{name}/$(basename $x) \"\$@\"" > %{name}-$(basename $x)
 chmod 755 %{name}-$(basename $x)
 done
+
+echo "#!/usr/bin/sh
+PATH=/usr/libexec/sdcc:\$PATH
+/usr/libexec/%{name}/sdcc \"\$@\"" > sdcc
+chmod 755 sdcc
+
 popd
 
 pushd $RPM_BUILD_ROOT%{_datadir}/%{name}/lib/src/pic16
