@@ -4,7 +4,8 @@ Release:        1%{?dist}
 Summary:        Small Device C Compiler
 License:        GPLv2+
 URL:            http://sdcc.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/sdcc/sdcc-src-%{version}.tar.bz2
+Source0:        https://downloads.sourceforge.net/project/%{name}/sdcc/%{version}/%{name}-src-%{version}.tar.bz2
+#Source0:        http://downloads.sourceforge.net/sdcc/sdcc-src-%{version}.tar.bz2
 Source1:        README.fedora
 Source2:        sdcc-%{version}-lyx-preferences
 Patch1:         sdcc-%{version}-python3.patch
