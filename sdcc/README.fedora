@@ -1,0 +1,4 @@
+Many of the executables in SDCC have very generic names. Therefore the binaries
+are installed into $PREFIX/libexec/sdcc/, and symlinks with prefix sdcc- are
+created in $PREFIX/bin. If this is a problem for you, you can add
+$PREFIX/libexec/sdcc/ to you path.

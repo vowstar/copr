@@ -1,0 +1,10 @@
+diff --git a/support/scripts/as2gbmap.py b/support/scripts/as2gbmap.py
+index 2ab5cde..193c878 100644
+--- a/support/scripts/as2gbmap.py
++++ b/support/scripts/as2gbmap.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # as2gbmap - asxxxx to gb map file converter
+ #

@@ -1,0 +1,81 @@
+# LyX 2.3.4.2 generated this file. If you want to make your own
+# modifications you should do them from inside LyX and save.
+
+Format 24
+
+
+#
+# MISC SECTION ######################################
+#
+
+
+#
+# SCREEN & FONTS SECTION ############################
+#
+
+
+#
+# COLOR SECTION ###################################
+#
+
+
+#
+# PRINTER SECTION ###################################
+#
+
+
+#
+# TEX SECTION #######################################
+#
+
+
+#
+# FILE SECTION ######################################
+#
+
+
+#
+# PLAIN TEXT EXPORT SECTION ##############################
+#
+
+
+#
+# SPELLCHECKER SECTION ##############################
+#
+
+
+#
+# LANGUAGE SUPPORT SECTION ##########################
+#
+
+
+#
+# 2nd MISC SUPPORT SECTION ##########################
+#
+
+
+#
+# FORMATS SECTION ##########################
+#
+
+
+#
+# CONVERTERS SECTION ##########################
+#
+
+\converter svg  pstex  "inkscape $$i --export-area-drawing -export-latex  -o $$o"	""
+\converter svg  pdftex  "inkscape $$i --export-area-drawing -export-latex  -o $$o"	""
+\converter emf  eps  "inkscape $$i --export-area-drawing  -o $$o"	""
+\converter wmf  pdf6  "inkscape $$i --export-area-drawing  -o $$o"	""
+\converter emf  pdf6  "inkscape $$i --export-area-drawing  -o $$o"	""
+\converter svg  pdf6 "inkscape $$i --export-area-drawing  -o $$o" ""
+\converter svgz pdf6 "inkscape $$i --export-area-drawing  -o $$o" ""
+\converter svg  eps  "inkscape $$i --export-area-drawing  -o $$o" ""
+\converter svgz eps  "inkscape $$i --export-area-drawing  -o $$o" ""
+\converter svg  png  "inkscape  $$i -o $$o" ""
+\converter svgz png  "inkscape  $$i -o $$o" ""
+
+#
+# COPIERS SECTION ##########################
+#
+
