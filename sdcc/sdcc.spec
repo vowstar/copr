@@ -1,3 +1,4 @@
+# sdcc configure script does not support --runstatedir
 %undefine _configure_use_runstatedir
 Name:           sdcc
 Version:        4.2.0
