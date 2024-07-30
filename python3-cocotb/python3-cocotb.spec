@@ -1,13 +1,13 @@
 %global pypi_name cocotb
 Name:           python3-%{pypi_name}
-Version:        1.8.1
+Version:        1.9.0
 Release:        1%{?dist}
 Summary:        Coroutine based cosimulation library for writing VHDL and Verilog
 License:        BSD
 URL:            https://cocotb.org
 Source0:        https://github.com/cocotb/cocotb/archive/v%{version}.tar.gz
 
-BuildRequires:  git gcc-c++ make python3-devel python3-setuptools
+BuildRequires:  git gcc-c++ make python3-devel python3-setuptools libstdc++-static
 Requires:       python3dist(setuptools)
 Requires:       python3dist(pytest)
 
