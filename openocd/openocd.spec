@@ -17,6 +17,7 @@ URL:            https://openocd.org
 BuildRequires:  gcc make libtool git
 BuildRequires:  chrpath libusbx-devel jimtcl-devel >= 0.78
 BuildRequires:  libusb1-devel texinfo libjaylink-devel >= 0.2
+BuildRequires:  libftdi-devel hidapi-devel
 %if ! 0%{?rhel} == 9
 BuildRequires:  stlink-devel
 %endif
@@ -24,10 +25,10 @@ BuildRequires:  stlink-devel
 BuildRequires:  sdcc
 %endif
 %if 0%{?epel}
-BuildRequires:  capstone-devel libftdi-devel hidapi-devel libgpiod-devel < 2
+BuildRequires:  capstone-devel libgpiod-devel < 2
 %endif
 %if 0%{?fedora}
-BuildRequires:  capstone-devel libftdi-devel hidapi-devel
+BuildRequires:  capstone-devel
 %endif
 
 %description
