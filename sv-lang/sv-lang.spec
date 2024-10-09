@@ -52,7 +52,7 @@ sed -i '/tests/d' tools/tidy/CMakeLists.txt
 # non-existent
 sed -i '/span.hpp/d' external/CMakeLists.txt
 
-%if ! (0%{?fedora} > 40)
+%if ! (0%{?fedora})
 # python3.6 support
 sed -i -e 's/GIT_TAG.*/GIT_TAG v2.12.0/' bindings/CMakeLists.txt
 %endif
@@ -71,7 +71,7 @@ pushd build
        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
        -DBUILD_SHARED_LIB=ON \
        -DSLANG_LIB_NAME="svlang" \
-       -D SLANG_USE_MIMALLOC=OFF \
+       -DSLANG_USE_MIMALLOC=OFF \
        -DSLANG_INCLUDE_DOCS=OFF \
        -DSLANG_INCLUDE_TESTS=OFF \
        -DSLANG_INCLUDE_PYLIB=ON \
@@ -111,3 +111,5 @@ popd
 %{python3_sitearch}/*
 
 %changelog
+* Sun Jun 19 2022 Cristian Balint <cristian.balint@gmail.com>
+- github update releases
