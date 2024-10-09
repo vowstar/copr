@@ -1,6 +1,6 @@
 %global pkgvers 0
-%global scdate0 20241009
-%global schash0 707442e0915dd7fdbfc5742b04ef16429373075a
+%global scdate0 20241001
+%global schash0 af1de4fa9c89d6ec19ffede45661111e23ddeb8b
 %global branch0 master
 %global source0 https://github.com/berkeley-abc/abc.git
 
@@ -99,7 +99,8 @@ export CXXFLAGS="$CFLAGS"
       -DCMAKE_SKIP_RPATH=YES \
       -DCMAKE_SKIP_INSTALL_RPATH=YES \
       -DCMAKE_VERBOSE_MAKEFILE=OFF \
-      -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+      -DABC_SKIP_TESTS=ON
 
 make ABC_MAKE_VERBOSE=0 ABC_USE_STDINT_H=1 %{?_smp_mflags}
 
