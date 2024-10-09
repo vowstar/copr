@@ -16,8 +16,7 @@ URL:            https://openocd.org
 
 BuildRequires:  gcc make libtool git
 BuildRequires:  chrpath libusbx-devel jimtcl-devel >= 0.78
-BuildRequires:  libusb1-devel texinfo libjaylink-devel >= 0.2
-BuildRequires:  libftdi-devel hidapi-devel
+BuildRequires:  libusb1-devel texinfo libjaylink-devel >= 0.2 libftdi-devel
 %if ! 0%{?rhel} == 9
 BuildRequires:  stlink-devel
 %endif
@@ -29,6 +28,9 @@ BuildRequires:  capstone-devel libgpiod-devel < 2
 %endif
 %if 0%{?fedora}
 BuildRequires:  capstone-devel
+%endif
+%if ! (0%{?centos} == 8 || 0%{?rhel} == 8)
+BuildRequires:   hidapi-devel
 %endif
 
 %description
@@ -79,16 +81,22 @@ popd
   --enable-ft232r \
   --enable-vsllink \
   --enable-xds110 \
+%if ! (0%{?centos} == 8 || 0%{?rhel} == 8)
   --enable-cmsis-dap-v2 \
+%else
   --disable-cmsis-dap-v2 \
+%endif
   --enable-osbdm \
   --enable-opendous \
   --enable-aice \
   --enable-usbprog \
   --enable-rlink \
   --enable-armjtagew \
+%if ! (0%{?centos} == 8 || 0%{?rhel} == 8)
   --enable-cmsis-dap \
+%else
   --disable-cmsis-dap \
+%endif
   --enable-nulink \
   --enable-kitprog \
   --enable-usb-blaster \
