@@ -7,8 +7,6 @@ License:        MIT
 URL:            https://github.com/MikePopoloski/slang
 Source0:        https://github.com/MikePopoloski/slang/archive/v%{version}.tar.gz
 
-Patch1:         fix-py313.patch
-
 BuildRequires:  git cmake doxygen
 BuildRequires:  python3 python3-devel python3-setuptools
 %if ! (0%{?rhel} || 0%{?openEuler} || (0%{?fedora} > 34 && 0%{?fedora} < 37))
