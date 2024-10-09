@@ -46,9 +46,7 @@ Summary:        %{summary}
 Obsoletes:      mingw64-hidapi-static < 0.11.2-6
  
 %description -n mingw64-hidapi %_description
-%if !(0%{?rhel} == 8 || 0%{?epel} == 8 || 0%{?centos})
 %{?mingw_debug_package}
-%endif
  
  
 %prep
