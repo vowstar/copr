@@ -1,6 +1,6 @@
 %global pkgvers 0
-%global scdate0 20240422
-%global schash0 6882622df8dc99c05b28fe420f3be6c396e07752
+%global scdate0 20241009
+%global schash0 32b2456e37eae5ee379f626c65c8509eaec16230
 %global branch0 master
 %global source0 https://github.com/chipsalliance/verible.git
 
