@@ -51,6 +51,8 @@ sed -i 's|DESTINATION .)|DESTINATION ${Python_SITEARCH})|' bindings/CMakeLists.t
 sed -i '/tests/d' tools/tidy/CMakeLists.txt
 # non-existent
 sed -i '/span.hpp/d' external/CMakeLists.txt
+# python3.6 support
+sed -z -i 's/FetchContent_Declare(\n\s*pybind11[^\n]*\n\s*GIT_REPOSITORY [^\n]*\n\s*GIT_TAG .*/FetchContent_Declare(\n  pybind11\n  GIT_REPOSITORY https:\/\/github.com\/pybind\/pybind11.git\n  GIT_TAG v2.12.0/' bindings/CMakeLists.txt
 
 %build
 mkdir -p build
