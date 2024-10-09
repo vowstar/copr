@@ -1,0 +1,10 @@
+--- src/sat/glucose/Glucose.cpp.orig	2019-05-30 20:27:31.000000000 -0600
++++ src/sat/glucose/Glucose.cpp	2019-06-04 09:41:02.469658200 -0600
+@@ -33,6 +33,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
+ #include "sat/glucose/Solver.h"
+ #include "sat/glucose/Constants.h"
+ #include "sat/glucose/System.h"
++#include "misc/util/abc_global.h"
+ 
+ ABC_NAMESPACE_IMPL_START
+ 

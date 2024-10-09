@@ -1,0 +1,96 @@
+--- src/base/abci/abcMiter.c.orig	2019-12-17 15:57:46.000000000 -0700
++++ src/base/abci/abcMiter.c	2019-12-18 09:44:30.567338848 -0700
+@@ -863,7 +863,7 @@ void Abc_NtkAddFrame( Abc_Ntk_t * pNtkFr
+ {
+     int fVerbose = 0;
+     int NodeBef = Abc_NtkNodeNum(pNtkFrames);
+-    char Buffer[10];
++    char Buffer[12];
+     Abc_Obj_t * pNode, * pLatch;
+     int i;
+     // create the prefix to be added to the node names
+--- src/base/io/ioReadBlifMv.c.orig	2019-12-18 09:43:13.388550105 -0700
++++ src/base/io/ioReadBlifMv.c	2019-12-18 09:43:30.483503314 -0700
+@@ -1626,7 +1626,7 @@ static int Io_MvParseLineMv( Io_MvMod_t
+ ***********************************************************************/
+ static int Io_MvWriteValues( Abc_Obj_t * pNode, Vec_Str_t * vFunc )
+ {
+-    char Buffer[10];
++    char Buffer[12];
+     Abc_Obj_t * pFanin;
+     int i;
+     // add the fanin number of values
+@@ -1656,7 +1656,7 @@ static int Io_MvWriteValues( Abc_Obj_t *
+ ***********************************************************************/
+ static int Io_MvParseLiteralMv( Io_MvMod_t * p, Abc_Obj_t * pNode, char * pToken, Vec_Str_t * vFunc, int iLit )
+ {
+-    char Buffer[10];
++    char Buffer[12];
+     Io_MvVar_t * pVar;
+     Abc_Obj_t * pFanin, * pNet;
+     char * pCur, * pNext;
+--- src/base/wlc/wlcNdr.c.orig	2019-12-17 15:57:46.000000000 -0700
++++ src/base/wlc/wlcNdr.c	2019-12-18 08:43:25.865457806 -0700
+@@ -487,7 +487,7 @@ Wlc_Ntk_t * Wlc_NtkFromNdr( void * pData
+     pNtk->pManName = Abc_NamStart( NameIdMax+1, 10 );
+     for ( i = 1; i <= NameIdMax; i++ )
+     {
+-        char pName[20]; sprintf( pName, "s%0*d", nDigits, i );
++        char pName[20]; snprintf( pName, 20U, "s%0*d", nDigits, i );
+         NameId = Abc_NamStrFindOrAdd( pNtk->pManName, pName, &fFound );
+         assert( !fFound && i == NameId );
+     }
+--- src/base/wln/wlnNdr.c.orig	2019-12-17 15:57:46.000000000 -0700
++++ src/base/wln/wlnNdr.c	2019-12-18 08:43:25.866457804 -0700
+@@ -256,7 +256,7 @@ Wln_Ntk_t * Wln_NtkFromNdr( void * pData
+     pNtk->pManName = Abc_NamStart( NameIdMax+1, 10 );
+     for ( i = 1; i <= NameIdMax; i++ )
+     {
+-        char pName[20]; sprintf( pName, "s%0*d", nDigits, i );
++        char pName[20]; snprintf( pName, 20U, "s%0*d", nDigits, i );
+         NameId = Abc_NamStrFindOrAdd( pNtk->pManName, pName, &fFound );
+         assert( !fFound && i == NameId );
+     }
+--- src/opt/dau/dauMerge.c.orig	2019-12-17 15:57:46.000000000 -0700
++++ src/opt/dau/dauMerge.c	2019-12-18 09:48:48.630632559 -0700
+@@ -715,7 +715,7 @@ Dau_DsdMergeStorePrintDefs( pS );
+ 
+     // create new function
+ //    assert( nVarsTotal <= 6 );
+-    sprintf( pS->pOutput, "(%s%s)", pDsd0, pDsd1 );
++    snprintf( pS->pOutput, DAU_MAX_STR, "(%s%s)", pDsd0, pDsd1 );
+     pTruth = Dau_DsdToTruth( pS->pOutput, nVarsTotal );
+     Status = Dau_DsdDecompose( pTruth, nVarsTotal, 0, 1, pS->pOutput );
+ //printf( "%d ", Status );
+--- src/proof/fra/fraCore.c.orig	2019-12-17 15:57:46.000000000 -0700
++++ src/proof/fra/fraCore.c	2019-12-18 09:50:22.838375767 -0700
+@@ -163,7 +163,7 @@ static inline void Fra_FraigNodeSpeculat
+     // create manager with the logic for these two nodes
+     pTemp = Aig_ManExtractMiter( p->pManFraig, pObjFraig, pObjReprFraig );
+     // dump the logic into a file
+-    sprintf( FileName, "aig\\%03d.blif", ++Counter );
++    snprintf( FileName, 20U, "aig\\%03d.blif", ++Counter );
+     Aig_ManDumpBlif( pTemp, FileName, NULL, NULL );
+     printf( "Speculation cone with %d nodes was written into file \"%s\".\n", Aig_ManNodeNum(pTemp), FileName );
+     // clean up
+--- src/aig/miniaig/ndr.h.orig	2021-08-14 18:20:47.371300451 +0300
++++ src/aig/miniaig/ndr.h	2021-08-14 18:20:16.149527474 +0300
+@@ -516,8 +516,16 @@
+ {
+     Ndr_Data_t * p = (Ndr_Data_t *)pDesign; int Mod;
+ 
+-    FILE * pFile = pFileName ? fopen( pFileName, "wb" ) : stdout;
+-    if ( pFile == NULL ) { printf( "Cannot open file \"%s\" for writing.\n", pFileName ); return; }
++    FILE * pFile;
++    if (pFileName)
++    {
++        pFile = fopen( pFileName, "wb" );
++        if ( pFile == NULL ) { printf( "Cannot open file \"%s\" for writing.\n", pFileName ); return; }
++    }
++    else
++    {
++        pFile = stdout;
++    }
+ 
+     Ndr_DesForEachMod( p, Mod )
+         Ndr_WriteVerilogModule( pFile, p, Mod, pNames, fSimple );

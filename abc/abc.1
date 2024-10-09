@@ -1,0 +1,102 @@
+.TH "ABC" "1" "@VERSION@" "ABC" "User Commands"
+.SH "NAME"
+abc \- sequential logic synthesis and formal verification
+.SH "SYNOPSIS"
+.B abc
+[\fIOPTIONS\fP] \fIFILE\fP
+.SH "DESCRIPTION"
+.PP
+ABC is a growing software system for synthesis and verification of binary
+sequential logic circuits appearing in synchronous hardware designs.  ABC
+combines scalable logic optimization based on And-Inverter Graphs (AIGs),
+optimal-delay DAG-based technology mapping for look-up tables and standard
+cells, and innovative algorithms for sequential synthesis and verification.
+.PP
+ABC provides an experimental implementation of these algorithms and a
+programming environment for building similar applications.  Future development
+will focus on improving the algorithms and making most of the packages
+stand-alone.  This will allow the user to customize ABC for their needs as if
+it were a toolbox rather than a complete tool.
+.SH "OPTIONS"
+.TP
+\fB\-c\fP \fICMD\fP
+Execute commands \fICMD\fP.
+.TP
+\fB\-q\fP \fICMD\fP
+Execute commands \fICMD\fP quietly.
+.TP
+\fB\-C\fP \fICMD\fP
+Execute commands \fICMD\fP, then continue in interactive mode.
+.TP
+\fB\-Q\fP \fICMD\fP
+Execute commands \fICMD\fP quietly, then continue in interactive mode.
+.TP
+\fB\-F\fP \fISCRIPT\fP
+Execute commands from script file \fISCRIPT\fP and echo commands.
+.TP
+\fB\-f\fP \fISCRIPT\fP
+Execute commands from script file \fISCRIPT\fP.
+.TP
+\fB\-h\fP
+Print command usage.
+.TP
+\fB\-o\fP \fIFILE\fP
+Store the result in \fIFILE\fP.
+.TP
+\fB\-s\fP
+Do not read any initialization file.
+.TP
+\fB\-t\fP \fITYPE\fP
+Specify the input type, one of \fIblif_mv\fP, \fIblif_mvs\fP, \fIblif\fP, or
+\fInone\fP.  The default is \fIblif_mv\fP.
+.TP
+\fB\-T\fP \fITYPE\fP
+Specify the output type, one of \fIblif_mv\fP, \fIblif_mvs\fP, \fIblif\fP, or
+\fInone\fP.  The default is \fIblif_mv\fP.
+.TP
+\fB\-x\fP
+Equivalent to \fI-t none -T none\fP.
+.TP
+\fB\-b\fP
+Run in bridge mode.
+.SH "INTRODUCTION"
+.PP
+Data structures and algorithms at the heart of a software system determine its
+capabilities in processing data and its efficiency as a programming
+environment for building new applications.  Extensive experience of developing
+and using SIS, VIS, and MVSIS, makes it clear that these systems do not
+provide a flexible programming environment to implement recent innovations,
+such as integration of technology mapping and retiming.  Specifically, the SIS
+environment is outdated and rather inefficient when handling large circuits.
+VIS, designed as a formal verification tool for multi-valued specifications,
+does not provide enough flexibility for binary synthesis.  MVSIS was developed
+and extensively used by us in the recent years for implementing new synthesis
+algorithms for both multi-valued and binary networks.  Finally, we became
+convinced that (a) the basic data structures and algorithms of MVSIS can be
+made considerably simpler and easier to use by assuming binary networks, and
+(b) a central place in the new system should be given to a new data structure,
+AIGs (multi-level logic networks composed of two-input ANDs and inverters),
+which promises improvements in quality and runtime of synthesis and
+verification.
+.PP
+This understanding motivates us to redevelop the core packages of MVSIS
+resulting in a new programming environment named ABC.  As the name suggests,
+the primary goal is to keep data structures simple and flexible for a wide
+range of applications.  The “philosophy of ABC” has several basic premises.
+One of them is allowing for a variety of functional representations, such as
+BDDs and SOPs, to solve specialized tasks, while defaulting to AIGs for the
+mainstream network manipulation.  Representing logic using AIGs leads to a
+remarkable uniformity in computation and efficient interfacing with CNF-based
+SAT solvers for handing Boolean reasoning problems.  Another fundamental
+premise of ABC is the synergy between synthesis and verification using
+efficient SAT-based Boolean reasoning on the AIG for combinational and
+sequential equivalence checking.
+.PP
+The goal of the ABC project is to provide a public-domain implementation of
+the state-of-the-art combinational and sequential synthesis algorithms and, at
+the same time, create an open-source environment, in which such applications
+can be developed and compared.  The current version of ABC can
+optimize/map/retime industrial gate-level designs with 100K gates and 10K
+sequential elements for optimal delay and heuristically minimized area in
+about one minute of CPU time on a modern computer.  The runtime of the
+combinational synthesis, mapping, and verification is typically faster.

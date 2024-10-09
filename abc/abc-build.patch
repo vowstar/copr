@@ -1,0 +1,26 @@
+--- CMakeLists.txt.orig	2019-12-17 15:57:46.000000000 -0700
++++ CMakeLists.txt	2019-12-18 09:13:25.779458679 -0700
+@@ -53,7 +53,7 @@ execute_process(
+     make
+         ${ABC_READLINE_FLAGS}
+         ${ABC_USE_NAMESPACE_FLAGS}
+-        ARCHFLAGS_EXE=${CMAKE_CURRENT_BINARY_DIR}/abc_arch_flags_program.exe
++        ABC_USE_STDINT_H=1
+         ABC_MAKE_NO_DEPS=1
+         CC=${CMAKE_C_COMPILER}
+         CXX=${CMAKE_CXX_COMPILER}
+@@ -94,6 +94,8 @@ list(REMOVE_ITEM ABC_SRC ${ABC_MAIN_SRC}
+ add_library(libabc EXCLUDE_FROM_ALL ${ABC_SRC})
+ abc_properties(libabc PUBLIC)
+ set_property(TARGET libabc PROPERTY OUTPUT_NAME abc)
++set_property(TARGET libabc PROPERTY VERSION "0.0.0")
++set_property(TARGET libabc PROPERTY SOVERSION 0)
+ 
+ add_executable(abc ${ABC_MAIN_SRC})
+ target_link_libraries(abc PRIVATE libabc)
+@@ -103,3 +105,5 @@ add_library(libabc-pic EXCLUDE_FROM_ALL
+ abc_properties(libabc-pic PUBLIC)
+ set_property(TARGET libabc-pic PROPERTY POSITION_INDEPENDENT_CODE ON)
+ set_property(TARGET libabc-pic PROPERTY OUTPUT_NAME abc-pic)
++set_property(TARGET libabc-pic PROPERTY VERSION "0.0.0")
++set_property(TARGET libabc-pic PROPERTY SOVERSION 0)

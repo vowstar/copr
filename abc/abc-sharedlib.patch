@@ -1,0 +1,22 @@
+--- Makefile.orig	2019-06-04 09:40:32.212192338 -0600
++++ Makefile	2019-06-04 09:40:51.291855524 -0600
+@@ -55,7 +55,7 @@ ARCHFLAGS := $(ARCHFLAGS)
+ 
+ OPTFLAGS  ?= -g -O
+ 
+-CFLAGS    += -Wall -Wno-unused-function -Wno-write-strings -Wno-sign-compare $(ARCHFLAGS)
++CFLAGS    += -Wno-unused-function $(OPTFLAGS) $(ARCHFLAGS) -Isrc
+ ifneq ($(findstring arm,$(shell uname -m)),)
+ 	CFLAGS += -DABC_MEMALIGN=4
+ endif
+@@ -221,7 +221,9 @@ lib$(PROG).a: $(LIBOBJ)
+ 
+ lib$(PROG).so: $(LIBOBJ)
+ 	@echo "$(MSG_PREFIX)\`\` Linking:" $(notdir $@)
+-	$(VERBOSE)$(CXX) -shared -o $@ $^ $(LIBS)
++	$(VERBOSE)$(CXX) -shared -Wl,-h,lib$(PROG).so.0 -o lib$(PROG).so.0.0.0 $^ $(LIBS)
++	$(VERBOSE)ln -s lib$(PROG).so.0.0.0 lib$(PROG).so.0
++	$(VERBOSE)ln -s lib$(PROG).so.0 $@
+ 
+ docs:
+ 	@echo "$(MSG_PREFIX)\`\` Building documentation." $(notdir $@)
