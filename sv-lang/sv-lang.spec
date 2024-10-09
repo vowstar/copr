@@ -60,7 +60,7 @@ sed -i -e 's/GIT_TAG.*/GIT_TAG v2.12.0/' bindings/CMakeLists.txt
 %endif
 
 # python3.13 support
-%patch -P 1 -p1
+%patch -P 1 -p1 -b bindings/python/NumericBindings.cpp
 
 %build
 mkdir -p build
