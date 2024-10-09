@@ -1,67 +1,59 @@
-Name:        iverilog
-Version:     12.0
-%define uver 12_0
-Release:     %autorelease
-Summary:     Icarus Verilog is a verilog compiler and simulator
-License:     GPLv2
-URL:         https://github.com/steveicarus/iverilog
-Source0:     https://github.com/steveicarus/iverilog/archive/%{name}-%{uver}.tar.gz
-# [PATCH] Fix compilation with -Werror=format-security
-Patch1:      23e51ef7a8e8e4ba42208936e0a6a25901f58c65.patch
+%global pkgvers 0
+%global scdate0 20241009
+%global schash0 25a84d5cfcecf67bfb7734929a1df98c4b137ce6
+%global branch0 master
+%global source0 https://github.com/steveicarus/iverilog.git
 
-BuildRequires: autoconf
-BuildRequires: bzip2-devel
-BuildRequires: bison
-BuildRequires: flex
-BuildRequires: gperf
-BuildRequires: gcc-c++
-BuildRequires: readline-devel
-BuildRequires: zlib-devel
-BuildRequires: make
+%global sshort0 %{expand:%%{lua:print(('%{schash0}'):sub(1,8))}}
 
+Name:           iverilog
+Version:        %(curl -s https://raw.githubusercontent.com/steveicarus/iverilog/%{schash0}/version_base.h | grep "define VERSION_M" | grep -o '[^ ]*$' | sed ':a;N;$!ba;s/\n/./g')
+Release:        %{scdate0}.%{pkgvers}.git%{sshort0}%{?dist}
+Summary:        Icarus Verilog is a verilog compiler and simulator
+License:        GPLv2
+
+URL:            http://iverilog.icarus.com
+
+BuildRequires:  git gcc-c++ autoconf bison flex gperf
+BuildRequires:  bzip2-devel readline-devel zlib-devel
 
 %description
 Icarus Verilog is a Verilog compiler that generates a variety of
 engineering formats, including simulation. It strives to be true
 to the IEEE-1364 standard.
 
+
 %prep
-%autosetup -n %{name}-%{uver}
-# Clean junks from tarball
-find . -type f -name ".git" -exec rm '{}' \;
-rm -rf `find . -type d -name "autom4te.cache" -exec echo '{}' \;`
+%setup -T -c -n %{name}
+git clone --depth 1 -n -b %{branch0} %{source0} .
+git fetch --depth 1 origin %{schash0}
+git reset --hard %{schash0}
+git log --format=fuller
+
 
 %build
+%global optflags %(echo "%{optflags}" | sed 's|-Werror=format-security||')
 chmod +x autoconf.sh
 sh autoconf.sh
-export CPPFLAGS="$CPPFLAGS -fcommon"
 %configure
-
-# use make, avoid use V=1 due https://github.com/steveicarus/iverilog/issues/262
 make %{?_smp_mflags}
 
 
 %install
-%{__make}    prefix=%{buildroot}%{_prefix} \
-             bindir=%{buildroot}%{_bindir} \
-             libdir=%{buildroot}%{_libdir} \
-             libdir64=%{buildroot}%{_libdir} \
-             includedir=%{buildroot}%{_includedir} \
-             mandir=%{buildroot}%{_mandir}  \
-             vpidir=%{buildroot}%{_libdir}/ivl/ \
-             INSTALL="install -p" \
+make    prefix=%{buildroot}%{_prefix} \
+        bindir=%{buildroot}%{_bindir} \
+        libdir=%{buildroot}%{_libdir} \
+        libdir64=%{buildroot}%{_libdir} \
+        includedir=%{buildroot}%{_includedir} \
+        mandir=%{buildroot}%{_mandir}  \
+        vpidir=%{buildroot}%{_libdir}/ivl/ \
+        INSTALL="install -p" \
 install
-
-%check
-make check
 
 
 %files
-%doc BUGS.txt QUICK_START.txt
-%doc ieee1364-notes.txt mingw.txt swift.txt netlist.txt
-%doc t-dll.txt vpi.txt cadpli/cadpli.txt
-%doc xilinx-hint.txt examples/
-%doc va_math.txt tgt-fpga/fpga.txt extensions.txt glossary.txt attributes.txt
+%doc README.md
+%doc examples/
 %license COPYING
 %{_bindir}/*
 %{_libdir}/ivl
@@ -70,3 +62,11 @@ make check
 %{_includedir}/*.h
 # RHBZ 480531
 %{_libdir}/*.a
+
+
+%changelog
+* Sat Feb 06 2021 Cristian Balint <cristian.balint@gmail.com>
+- upstream git builds
+
+* Sun Feb 17 2019 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 10_2-5
+- Rebuild for readline 8.0
