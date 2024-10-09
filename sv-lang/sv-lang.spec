@@ -51,8 +51,11 @@ sed -i 's|DESTINATION .)|DESTINATION ${Python_SITEARCH})|' bindings/CMakeLists.t
 sed -i '/tests/d' tools/tidy/CMakeLists.txt
 # non-existent
 sed -i '/span.hpp/d' external/CMakeLists.txt
+
+%if ! (0%{?fedora} > 40)
 # python3.6 support
 sed -i -e 's/GIT_TAG.*/GIT_TAG v2.12.0/' bindings/CMakeLists.txt
+%endif
 
 %build
 mkdir -p build
