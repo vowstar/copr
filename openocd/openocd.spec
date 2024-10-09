@@ -15,14 +15,19 @@ License:        GPLv2
 URL:            https://openocd.org
 
 BuildRequires:  gcc make libtool git
-BuildRequires:  chrpath libftdi-devel libusbx-devel jimtcl-devel >= 0.78
-BuildRequires:  hidapi-devel libusb1-devel texinfo libjaylink-devel >= 0.2
-BuildRequires:  capstone-devel libgpiod-devel < 2
+BuildRequires:  chrpath libusbx-devel jimtcl-devel >= 0.78
+BuildRequires:  libusb1-devel texinfo libjaylink-devel >= 0.2
 %if ! 0%{?rhel} == 9
 BuildRequires:  stlink-devel
 %endif
 %if 0%{?fedora}
 BuildRequires:  sdcc
+%endif
+%if 0%{?epel}
+BuildRequires:  capstone-devel libftdi-devel hidapi-devel libgpiod-devel < 2
+%endif
+%if 0%{?fedora}
+BuildRequires:  capstone-devel libftdi-devel hidapi-devel
 %endif
 
 %description
