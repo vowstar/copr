@@ -16,7 +16,10 @@ URL:            http://jim.tcl.tk
 
 BuildRequires:  gcc gcc-c++ asciidoc make git tcl
 BuildRequires:  pkgconfig(openssl) pkgconfig(zlib)
-BuildRequires:  sqlite-devel hiredis-devel json-devel readline-devel
+BuildRequires:  sqlite-devel readline-devel
+%if !(0%{?rhel})
+BuildRequires: hiredis-devel json-devel
+%else
 
 %description
 Jim is an opensource small-footprint implementation of the Tcl programming
