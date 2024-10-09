@@ -35,7 +35,7 @@ BuildRequires:  tex(skull.sty) tex(subfigure.sty) tex(moreverb.sty) tex(epsf.sty
 BuildRequires:  tex(dsfont.sty) tex(algorithm2e.sty) tex(multibib.sty)
 %endif
 
-Requires:       abc graphviz python-xdot
+Requires:       abc graphviz python3-xdot
 Requires:       %{name}-share = %{version}-%{release}
 
 %global _lto_cflags %{nil}
