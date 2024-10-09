@@ -1,6 +1,6 @@
 %global pkgvers 0
 %global scdate0 20241009
-%global schash0 041f6603c3cb2c71d42fa3629dcff0eac118b993
+%global schash0 2f5c58b345eca4bf81cace78e9a1d867fa579eef
 %global branch0 master
 %global source0 https://github.com/verilator/verilator.git
 
