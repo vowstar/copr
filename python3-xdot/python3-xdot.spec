@@ -1,5 +1,5 @@
 Name:           python-xdot
-Version:        1.1
+Version:        1.4
 Release:        7%{?dist}
 Summary:        Interactive viewer for Graphviz dot files
 
