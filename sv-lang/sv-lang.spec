@@ -60,7 +60,9 @@ sed -i -e 's/GIT_TAG.*/GIT_TAG v2.12.0/' bindings/CMakeLists.txt
 %endif
 
 # python3.13 support
-%patch -P 1 -p1 -b bindings/python/NumericBindings.cpp
+sed -i '/r = _PyLong_AsByteArray/{N;d;}' bindings/python/NumericBindings.cpp
+sed -i '/if (r == -1)/i\    int r = -1;\n#if PY_VERSION_HEX < 0x030D0000\n    r = _PyLong_AsByteArray(reinterpret_cast<PyLongObject*>(value.ptr()),\n                            reinterpret_cast<unsigned char*>(mem.data()), numBytes, 1, 1);\n#else\n    // fix build error with python 3.13\n    r = _PyLong_AsByteArray(reinterpret_cast<PyLongObject*>(value.ptr()),\n                            reinterpret_cast<unsigned char*>(mem.data()), numBytes, 1, 1, 0);\n    // No exception is thrown here because it will be done later.\n#endif' bindings/python/NumericBindings.cpp
+
 
 %build
 mkdir -p build
