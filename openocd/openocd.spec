@@ -94,10 +94,11 @@ popd
   --enable-armjtagew \
 %if ! (0%{?centos} == 8 || 0%{?rhel} == 8)
   --enable-cmsis-dap \
+  --enable-nulink \
 %else
   --disable-cmsis-dap \
+  --disable-nulink \
 %endif
-  --enable-nulink \
   --enable-kitprog \
   --enable-usb-blaster \
   --enable-presto \
