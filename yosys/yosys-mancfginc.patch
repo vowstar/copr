@@ -1,0 +1,12 @@
+diff -up yosys-5199aafca0579aceb3b4a2ad1af610bcb4ccfcd1/manual/PRESENTATION_Prog/Makefile.mancfginc yosys-5199aafca0579aceb3b4a2ad1af610bcb4ccfcd1/manual/PRESENTATION_Prog/Makefile
+--- yosys/manual/PRESENTATION_Prog/Makefile.mancfginc	2020-12-25 15:40:19.072895331 +0200
++++ yosys/manual/PRESENTATION_Prog/Makefile	2020-12-25 15:41:13.252281913 +0200
+@@ -5,7 +5,7 @@
+ DATDIR=$(shell ../../yosys-config --datdir)
+ 
+ my_cmd.so: my_cmd.cc
+-	../../yosys-config --exec --cxx $(subst $(DATDIR),../../share,$(CXXFLAGS)) --ldflags -o my_cmd.so -shared my_cmd.cc --ldlibs
++	../../yosys-config --exec --cxx --cxxflags -I../.. --ldflags -o my_cmd.so -shared my_cmd.cc --ldlibs
+ 
+ test0.log: my_cmd.so
+ 	../../yosys -Ql test0.log_new -m ./my_cmd.so -p 'my_cmd foo bar' absval_ref.v

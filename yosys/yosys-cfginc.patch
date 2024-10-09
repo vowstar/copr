@@ -1,0 +1,13 @@
+diff --git a/Makefile b/Makefile
+index 5a5288d..94f4f39 100644
+--- a/Makefile
++++ b/Makefile
+@@ -790,7 +790,7 @@ LDLIBS_NOVERIFIC = $(LDLIBS)
+ endif
+ 
+ $(PROGRAM_PREFIX)yosys-config: misc/yosys-config.in
+-	$(P) $(SED) -e 's#@CXXFLAGS@#$(subst -Ilibs/dlfcn-win32,,$(subst -I. -I"$(YOSYS_SRC)",-I"$(DATDIR)/include",$(strip $(CXXFLAGS_NOVERIFIC))))#;' \
++	$(P) $(SED) -e 's#@CXXFLAGS@#$(subst -Ilibs/dlfcn-win32,,$(subst -I. -I"$(YOSYS_SRC)",-I"$(DATDIR)/include/yosys",$(strip $(CXXFLAGS_NOVERIFIC))))#;' \
+ 			-e 's#@CXX@#$(strip $(CXX))#;' -e 's#@LDFLAGS@#$(strip $(LDFLAGS) $(PLUGIN_LDFLAGS))#;' -e 's#@LDLIBS@#$(strip $(LDLIBS_NOVERIFIC) $(PLUGIN_LDLIBS))#;' \
+ 			-e 's#@BINDIR@#$(strip $(BINDIR))#;' -e 's#@DATDIR@#$(strip $(DATDIR))#;' < $< > $(PROGRAM_PREFIX)yosys-config
+ 	$(Q) chmod +x $(PROGRAM_PREFIX)yosys-config
