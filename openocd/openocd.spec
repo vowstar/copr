@@ -83,8 +83,6 @@ popd
   --enable-xds110 \
 %if ! (0%{?centos} == 8 || 0%{?rhel} == 8)
   --enable-cmsis-dap-v2 \
-%else
-  --disable-cmsis-dap-v2 \
 %endif
   --enable-osbdm \
   --enable-opendous \
@@ -95,11 +93,8 @@ popd
 %if ! (0%{?centos} == 8 || 0%{?rhel} == 8)
   --enable-cmsis-dap \
   --enable-nulink \
-%else
-  --disable-cmsis-dap \
-  --disable-nulink \
-%endif
   --enable-kitprog \
+%endif
   --enable-usb-blaster \
   --enable-presto \
   --enable-openjtag \
@@ -107,6 +102,7 @@ popd
   --enable-parport \
   --enable-jtag_vpi \
   --enable-jtag_dpi \
+%if ! (0%{?centos} == 8 || 0%{?rhel} == 8)
   --enable-ioutil \
   --enable-amtjtagaccel \
   --enable-ep39xx \
@@ -115,13 +111,16 @@ popd
   --enable-oocd_trace \
   --enable-buspirate \
   --enable-sysfsgpio \
-  %if 0%{?epel}
+  %endif
+%if 0%{?epel}
   --enable-linuxgpiod \
   %else
   --disable-linuxgpiod \
   %endif
+%if ! (0%{?centos} == 8 || 0%{?rhel} == 8)
   --enable-xlnx-pcie-xvc \
   --enable-remote-bitbang \
+%endif
   --disable-internal-jimtcl \
   --disable-internal-libjaylink \
   --disable-doxygen-html \
