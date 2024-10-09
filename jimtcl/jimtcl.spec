@@ -19,7 +19,7 @@ BuildRequires:  pkgconfig(openssl) pkgconfig(zlib)
 BuildRequires:  sqlite-devel readline-devel
 %if !(0%{?rhel})
 BuildRequires: hiredis-devel json-devel
-%else
+%endif
 
 %description
 Jim is an opensource small-footprint implementation of the Tcl programming
