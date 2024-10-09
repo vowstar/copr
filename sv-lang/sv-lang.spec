@@ -52,15 +52,12 @@ sed -i '/tests/d' tools/tidy/CMakeLists.txt
 # non-existent
 sed -i '/span.hpp/d' external/CMakeLists.txt
 
-%global python_version %(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')
-
-%if "%{python_version}" <= "3.6"
-# python3.6 support
-sed -i -e 's/GIT_TAG.*/GIT_TAG v2.12.0/' bindings/CMakeLists.txt
-%endif
-%if "%{python_version}" >= "3.13"
+%if 0%{?fedora}
 # python3.13 support
 sed -i 's/numBytes, 1, 1)/numBytes, 1, 1, 0)/' bindings/python/NumericBindings.cpp
+%else
+# python3.6 support
+sed -i -e 's/GIT_TAG.*/GIT_TAG v2.12.0/' bindings/CMakeLists.txt
 %endif
 
 %build
