@@ -106,7 +106,11 @@ popd
   --enable-oocd_trace \
   --enable-buspirate \
   --enable-sysfsgpio \
+  %if 0%{?epel}
   --enable-linuxgpiod \
+  %else
+  --disable-linuxgpiod \
+  %endif
   --enable-xlnx-pcie-xvc \
   --enable-remote-bitbang \
   --disable-internal-jimtcl \
