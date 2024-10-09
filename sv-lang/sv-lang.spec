@@ -7,7 +7,7 @@ License:        MIT
 URL:            https://github.com/MikePopoloski/slang
 Source0:        https://github.com/MikePopoloski/slang/archive/v%{version}.tar.gz
 
-Patch0:         fix-py313.patch
+Patch1:         fix-py313.patch
 
 BuildRequires:  git cmake doxygen
 BuildRequires:  python3 python3-devel python3-setuptools
@@ -60,7 +60,7 @@ sed -i -e 's/GIT_TAG.*/GIT_TAG v2.12.0/' bindings/CMakeLists.txt
 %endif
 
 # python3.13 support
-%patch -P 0 -p1 -b bindings/python/NumericBindings.cpp
+%patch -P 1 -p1
 
 %build
 mkdir -p build
