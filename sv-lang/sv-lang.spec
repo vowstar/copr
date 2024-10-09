@@ -66,6 +66,7 @@ pushd build
 %endif
 
 %cmake .. -Wno-dev \
+       -DCMAKE_CXX_FLAGS="-fpermissive" \
        -DCMAKE_SKIP_RPATH=ON \
        -DCMAKE_VERBOSE_MAKEFILE=OFF \
        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
