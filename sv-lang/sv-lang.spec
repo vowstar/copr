@@ -7,6 +7,8 @@ License:        MIT
 URL:            https://github.com/MikePopoloski/slang
 Source0:        https://github.com/MikePopoloski/slang/archive/v%{version}.tar.gz
 
+Patch0:         fix-py313.patch
+
 BuildRequires:  git cmake doxygen
 BuildRequires:  python3 python3-devel python3-setuptools
 %if ! (0%{?rhel} || 0%{?openEuler} || (0%{?fedora} > 34 && 0%{?fedora} < 37))
@@ -52,13 +54,13 @@ sed -i '/tests/d' tools/tidy/CMakeLists.txt
 # non-existent
 sed -i '/span.hpp/d' external/CMakeLists.txt
 
-%if 0%{?fedora}
-# python3.13 support
-sed -i 's/numBytes, 1, 1)/numBytes, 1, 1, 0)/' bindings/python/NumericBindings.cpp
-%else
+%if ! (0%{?fedora})
 # python3.6 support
 sed -i -e 's/GIT_TAG.*/GIT_TAG v2.12.0/' bindings/CMakeLists.txt
 %endif
+
+# python3.13 support
+%patch -P 1 -p1 -b bindings/python/NumericBindings.cpp
 
 %build
 mkdir -p build

@@ -1,0 +1,40 @@
+From 36321758fbb65d6ba375d91e0d2590320043a48a Mon Sep 17 00:00:00 2001
+From: Huang Rui <vowstar@gmail.com>
+Date: Wed, 9 Oct 2024 16:15:26 +0800
+Subject: [PATCH] fix: update _PyLong_AsByteArray call for Python 3.13 API
+ changes
+
+- Corrected the function call to _PyLong_AsByteArray for Python 3.13.
+- Added the missing 'with_exceptions' argument based on the new signature.
+- Ensured backward compatibility with Python versions before 3.13.
+
+Closes: https://github.com/MikePopoloski/slang/issues/1147
+Signed-off-by: Huang Rui <vowstar@gmail.com>
+---
+ bindings/python/NumericBindings.cpp | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/bindings/python/NumericBindings.cpp b/bindings/python/NumericBindings.cpp
+index d80a70006..659d467a8 100644
+--- a/bindings/python/NumericBindings.cpp
++++ b/bindings/python/NumericBindings.cpp
+@@ -32,8 +32,17 @@ static SVInt SVIntFromPyInt(const py::int_& value) {
+     size_t numBytes = ((bits - 1) / 32 + 1) * 4;
+     std::vector<byte> mem(numBytes);
+ 
+-    int r = _PyLong_AsByteArray(reinterpret_cast<PyLongObject*>(value.ptr()),
+-                                reinterpret_cast<unsigned char*>(mem.data()), numBytes, 1, 1);
++    int r = -1;
++#if PY_VERSION_HEX < 0x030D0000
++    r = _PyLong_AsByteArray(reinterpret_cast<PyLongObject*>(value.ptr()),
++                            reinterpret_cast<unsigned char*>(mem.data()), numBytes, 1, 1);
++#else
++    // fix build error with python 3.13
++    r = _PyLong_AsByteArray(reinterpret_cast<PyLongObject*>(value.ptr()),
++                            reinterpret_cast<unsigned char*>(mem.data()), numBytes, 1, 1, 0);
++    // No exception is thrown here because it will be done later.
++#endif
++
+     if (r == -1)
+         throw py::error_already_set();
+ 
