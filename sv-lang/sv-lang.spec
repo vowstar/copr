@@ -60,7 +60,7 @@ sed -i -e 's/GIT_TAG.*/GIT_TAG v2.12.0/' bindings/CMakeLists.txt
 %endif
 %if "%{python_version}" >= "3.13"
 # python3.13 support
-sed -i 's/reinterpret_cast<unsigned char*>(mem.data()), numBytes, 1, 1)/reinterpret_cast<unsigned char*>(mem.data()), numBytes, 1, 1, 0)/' bindings/python/NumericBindings.cpp
+sed -i 's/numBytes, 1, 1)/numBytes, 1, 1, 0)/' bindings/python/NumericBindings.cpp
 %endif
 
 %build
