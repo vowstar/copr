@@ -1,10 +1,10 @@
 Name:           verilator
-Version:        5.024
+Version:        5.028
 Release:        1%{?dist}
 
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPLv3 or Artistic 2.0
-URL:            https://veripool.org/verilator/
+URL:            https://verilator.org
 Source0:        https://github.com/verilator/verilator/archive/refs/tags/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  bison
