@@ -78,14 +78,22 @@ popd
   --enable-ft232r \
   --enable-vsllink \
   --enable-xds110 \
+%if (0%{?epel} || 0%{?fedora})
   --enable-cmsis-dap-v2 \
+%else
+  --disable-cmsis-dap-v2 \
+%endif
   --enable-osbdm \
   --enable-opendous \
   --enable-aice \
   --enable-usbprog \
   --enable-rlink \
   --enable-armjtagew \
+%if (0%{?epel} || 0%{?fedora})
   --enable-cmsis-dap \
+%else
+  --disable-cmsis-dap \
+%endif
   --enable-nulink \
   --enable-kitprog \
   --enable-usb-blaster \
