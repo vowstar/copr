@@ -1,6 +1,6 @@
 %global pkgvers 0
-%global scdate0 20241001
-%global schash0 af1de4fa9c89d6ec19ffede45661111e23ddeb8b
+%global scdate0 20241009
+%global schash0 707442e0915dd7fdbfc5742b04ef16429373075a
 %global branch0 master
 %global source0 https://github.com/berkeley-abc/abc.git
 
