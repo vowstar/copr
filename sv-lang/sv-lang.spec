@@ -52,9 +52,15 @@ sed -i '/tests/d' tools/tidy/CMakeLists.txt
 # non-existent
 sed -i '/span.hpp/d' external/CMakeLists.txt
 
-%if ! (0%{?fedora})
+%global python_version %(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')
+
+%if "%{python_version}" <= "3.6"
 # python3.6 support
 sed -i -e 's/GIT_TAG.*/GIT_TAG v2.12.0/' bindings/CMakeLists.txt
+%endif
+%if "%{python_version}" >= "3.13"
+# python3.13 support
+sed -i 's/reinterpret_cast<unsigned char*>(mem.data()), numBytes, 1, 1)/reinterpret_cast<unsigned char*>(mem.data()), numBytes, 1, 1, 0)/' bindings/python/NumericBindings.cpp
 %endif
 
 %build
@@ -66,7 +72,6 @@ pushd build
 %endif
 
 %cmake .. -Wno-dev \
-       -DCMAKE_CXX_FLAGS="-fpermissive" \
        -DCMAKE_SKIP_RPATH=ON \
        -DCMAKE_VERBOSE_MAKEFILE=OFF \
        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
