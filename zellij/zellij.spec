@@ -29,13 +29,13 @@ Zellij is a workspace aimed at developers, ops-oriented people and anyone who lo
 %prep
 %autosetup -p1
 
-curl https://sh.rustup.rs -sSf | sh -s -- --profile minimal -y
+curl https://sh.rustup.rs -sSf | sh -s -- --profile minimal --default-toolchain none  -y
 
 %install
 export CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_OPT_LEVEL=3
 export PATH="$HOME/.cargo/bin:$PATH"
-rustup default stable
-cargo install --root=%{buildroot}%{_prefix} --path=.
+$HOME/.cargo/bin/rustup default 1.75.0
+$HOME/.cargo/bin/cargo install --root=%{buildroot}%{_prefix} --path=.
 
 rm -f %{buildroot}%{_prefix}/.crates.toml \
     %{buildroot}%{_prefix}/.crates2.json
