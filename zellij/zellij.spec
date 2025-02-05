@@ -33,11 +33,8 @@ curl https://sh.rustup.rs -sSf | sh -s -- --profile minimal -y
 
 %install
 export CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_OPT_LEVEL=3
-%if 0%{?el8}
-  $HOME/.cargo/bin/cargo install --root=%{buildroot}%{_prefix} --path=.
-%else
-  cargo install --root=%{buildroot}%{_prefix} --path=.
-%endif
+
+$HOME/.cargo/bin/cargo install --root=%{buildroot}%{_prefix} --path=.
 
 rm -f %{buildroot}%{_prefix}/.crates.toml \
     %{buildroot}%{_prefix}/.crates2.json
