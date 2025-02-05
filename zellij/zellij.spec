@@ -9,11 +9,6 @@ License:    MIT
 URL:        https://github.com/zellij-org/zellij
 Source0:    %{url}/archive/refs/tags/v%{version}.tar.gz
 
-%if 0%{?el8}
-%else
-BuildRequires: cargo >= 1.39
-BuildRequires: rust >= 1.39
-%endif
 BuildRequires: gcc
 BuildRequires: python3-devel
 BuildRequires: cmake
@@ -33,10 +28,8 @@ Zellij is a workspace aimed at developers, ops-oriented people and anyone who lo
 
 %prep
 %autosetup -p1
-%if 0%{?el8}
-  curl https://sh.rustup.rs -sSf | sh -s -- --profile minimal -y
-%endif
 
+curl https://sh.rustup.rs -sSf | sh -s -- --profile minimal -y
 
 %install
 export CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_OPT_LEVEL=3
