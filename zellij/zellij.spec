@@ -35,7 +35,7 @@ curl https://sh.rustup.rs -sSf | sh -s -- --profile minimal --default-toolchain 
 export CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_OPT_LEVEL=3
 export PATH="$HOME/.cargo/bin:$PATH"
 $HOME/.cargo/bin/rustup default 1.75.0
-echo -e "\n[patch.crates-io]\nhome = { version = \"0.5.9\" }" >> Cargo.toml
+echo -e "\n[patch.crates-io]\nhome = { version = \"=0.5.9\" }" >> Cargo.toml
 $HOME/.cargo/bin/cargo install --root=%{buildroot}%{_prefix} --path=.
 
 rm -f %{buildroot}%{_prefix}/.crates.toml \
