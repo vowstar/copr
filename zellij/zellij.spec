@@ -33,6 +33,7 @@ curl https://sh.rustup.rs -sSf | sh -s -- --profile minimal -y
 
 %install
 export CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_OPT_LEVEL=3
+export PATH=$HOME/.cargo/bin:$PATH
 
 $HOME/.cargo/bin/cargo install --root=%{buildroot}%{_prefix} --path=.
 
