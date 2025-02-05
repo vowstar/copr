@@ -20,7 +20,11 @@ BuildRequires: cmake
 BuildRequires: openssl-devel
 BuildRequires: perl-devel
 BuildRequires: openssl-perl
-BuildRequires: perl-FindBin
+%if 0%{?rhel} < 9
+BuildRequires:  perl-interpreter
+%else
+BuildRequires:  perl-FindBin
+%endif
 BuildRequires: perl-IPC-Cmd
 
 %description
