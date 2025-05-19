@@ -34,7 +34,7 @@ curl https://sh.rustup.rs -sSf | sh -s -- --profile minimal --default-toolchain 
 %build
 export CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_OPT_LEVEL=3
 export PATH="$HOME/.cargo/bin:$PATH"
-$HOME/.cargo/bin/rustup default 1.75.0
+$HOME/.cargo/bin/rustup default 1.87.0
 $HOME/.cargo/bin/cargo build -p typst-cli --release --all-features --locked
 
 %install
