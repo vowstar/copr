@@ -1,6 +1,6 @@
 %global pkgvers 0
-%global scdate0 20241009
-%global schash0 25a84d5cfcecf67bfb7734929a1df98c4b137ce6
+%global scdate0 20221127
+%global schash0 4fd5291632232fbe1ba49b2c26bb6b2bf1c6c9cf
 %global branch0 master
 %global source0 https://github.com/steveicarus/iverilog.git
 
