@@ -12,7 +12,8 @@ This is SARASA GOTHIC, a CJK composite font based on
 Inter, Iosevka and Source Han Sans.
 
 %prep
-%autosetup
+%autosetup -c -T
+unzip -qq %{SOURCE0}
 
 %build
 
