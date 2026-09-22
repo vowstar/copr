@@ -13,7 +13,9 @@ Summary:        GStreamer streaming media framework runtime
 License:        LGPLv2+
 URL:            http://gstreamer.freedesktop.org/
 #Source:         http://gstreamer.freedesktop.org/src/gstreamer/pre/gstreamer-%%{version}.tar.xz
-Source:         http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-%{version}.tar.xz
+# https, not http: COPR downloads sources with curl --proto -all,+https,+ftps,
+# so an http:// source URL fails the SRPM step (build 11020247).
+Source:         https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-%{version}.tar.xz
 # http://cgit.freedesktop.org/gstreamer/gstreamer/patch/?id=60516f4
 Patch0:         gstreamer-0.10.36-bison3.patch
 
