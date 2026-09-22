@@ -35,7 +35,7 @@ This package containes gputils documentation and HTML documentation for supporte
 
 %prep
 %setup -q
-%patch1 -p0
+%patch -P 1 -p0
 
 %build
 autoconf -f -i
