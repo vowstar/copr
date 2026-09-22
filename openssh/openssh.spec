@@ -107,6 +107,7 @@ Summary:        An open source SSH server daemon
 Requires:       %{name} = %{version}-%{release}
 Requires(pre):  /usr/sbin/useradd
 Requires(pre):  /usr/sbin/groupadd
+Requires:       xauth
 Requires:       pam
 
 %description server
