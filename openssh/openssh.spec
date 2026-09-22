@@ -26,7 +26,7 @@
 
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        An open source implementation of SSH protocol version 2
 
 License:        BSD-3-Clause AND BSD-2-Clause AND ISC AND SSH-OpenSSH AND ssh-keyscan AND snprintf
@@ -50,6 +50,18 @@ BuildRequires:  groff
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
 BuildRequires:  pam-devel
+# GSSAPI (Kerberos 5) support.  Not optional on el8/el9 in practice: the
+# distribution's crypto-policies feed sshd a command line of -o options
+# (/etc/crypto-policies/back-ends/opensshserver.config, expanded by the unit
+# into $CRYPTO_POLICY) that includes -oGSSAPIKexAlgorithms=...  An sshd built
+# without krb5 does not know that option, and an unknown option passed with -o
+# is fatal -- only a warning when it comes from the config file:
+#   command-line: line 0: Bad configuration option: GSSAPIKexAlgorithms
+#   sshd.service: Main process exited, code=exited, status=1/FAILURE
+# so the daemon never starts and systemd retries forever.  Building with
+# krb5-devel also removes the GSSAPIAuthentication / GSSAPICleanupCredentials
+# "Unsupported option" warnings from sshd_config.
+BuildRequires:  krb5-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  audit-libs-devel
 BuildRequires:  systemd-devel
@@ -107,6 +119,7 @@ default configuration and the helper that generates the host keys.
     --with-mantype=man \
     --with-sandbox=seccomp_filter \
     --with-pam \
+    --with-kerberos5 \
     --with-selinux \
     --with-audit=linux \
     --with-pie=no \
@@ -225,6 +238,14 @@ exit 0
 %{_mandir}/man8/sftp-server.8*
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-2
+- Build with krb5-devel and --with-kerberos5.  Without GSSAPI the daemon does
+  not understand the -oGSSAPIKexAlgorithms=... option that the RHEL 8/9 crypto
+  policies pass on the sshd command line, an unknown option given with -o is
+  fatal (unlike one in the config file), and the service never came up:
+    command-line: line 0: Bad configuration option: GSSAPIKexAlgorithms
+    sshd.service: Main process exited, code=exited, status=1/FAILURE
+
 * Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-1
 - Initial package: upstream OpenSSH 10.5p1 for RHEL/CentOS 8, built from the
   portable tarball with the packaging skeleton (subpackage split, systemd units,
