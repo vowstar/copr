@@ -1,7 +1,7 @@
 %global pypi_name cocotb-test
 %global debug_package %{nil}
 Name:           python3-%{pypi_name}
-Version:        0.2.5
+Version:        0.2.6
 Release:        1%{?dist}
 Summary:        Provides standard python unit testing capabilities for cocotb
 License:        BSD-2-Clause
@@ -48,3 +48,5 @@ Provides:       %{pypi_name}
 %{python3_sitelib}/*
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 0.2.6-1
+- Update to 0.2.6
