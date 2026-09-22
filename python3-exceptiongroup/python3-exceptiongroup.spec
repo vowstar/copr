@@ -21,7 +21,7 @@
 #     -r fedora-43-x86_64 -r fedora-44-x86_64 \
 #     --name python3-exceptiongroup vowstar/eda
 # The el8 family is excluded: flit_scm is a PEP 517 backend needing python
-# >= 3.8 and el8's platform python3 is 3.6, so %generate_buildrequires fails
+# >= 3.8 and el8's platform python3 is 3.6, so %%generate_buildrequires fails
 # there.  This package exists to satisfy cocotb on el9, which is el9-only too.
 
 Name:           python3-exceptiongroup

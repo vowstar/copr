@@ -109,7 +109,7 @@ export CXXFLAGS="$CFLAGS"
       -DCMAKE_BUILD_TYPE=RelWithDebInfo \
       -DABC_SKIP_TESTS=ON
 
-# fedora-44 and newer default %cmake to the Ninja generator, and ABC ships a
+# fedora-44 and newer default %%cmake to the Ninja generator, and ABC ships a
 # Makefile in its source root, so a bare make there picks up ABC's own makefile
 # instead of the generated one and dies with
 #   make: *** No rule to make target 'libabc'.  Stop.

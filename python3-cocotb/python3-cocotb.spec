@@ -15,7 +15,7 @@ BuildRequires:  gcc-c++ make python3-devel python3-setuptools libstdc++-static
 #     -r fedora-43-x86_64 -r fedora-44-x86_64 --name python3-cocotb vowstar/eda
 # Why the exclusions:
 #  - el8 family: cocotb 2.x needs python >= 3.9, el8's platform python3 is 3.6,
-#    and the build aborts in %generate_buildrequires.
+#    and the build aborts in %%generate_buildrequires.
 #  - fedora-45 / eln / rawhide: they ship python 3.15 and the build refuses
 #    with "cocotb 2.1.0 only supports a maximum Python version of 3.14".
 # runtime dependencies of cocotb 2.x, see pyproject.toml:

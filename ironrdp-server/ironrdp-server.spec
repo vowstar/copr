@@ -49,7 +49,7 @@
 # Cargo compiles the generated C dependencies (aws-lc-sys, zstd) inside
 # CARGO_HOME, i.e. outside the rpmbuild BUILD directory, so the list of debug
 # source files ends up empty and rpmbuild aborts the automatic debugsource
-# subpackage with "Empty %files file .../debugsourcefiles.list".  Undefining the
+# subpackage with "Empty %%files file .../debugsourcefiles.list".  Undefining the
 # macro (defined as 1 in redhat-rpm-config) disables that subpackage; the
 # debuginfo subpackage is kept.
 %undefine _debugsource_packages
