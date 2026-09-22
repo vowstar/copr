@@ -7,7 +7,7 @@ Summary(fr):	Outils de développement pour les microcontrôleurs PIC (TM) de Mic
 License:	GPLv2+
 URL:		http://gputils.sourceforge.net
 Source:     https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.bz2
-#Source:		http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.bz2
+#Source:		http://downloads.sourceforge.net/%%%{name}/%%%{name}-%%{version}.tar.bz2
 Patch1:		gpasm_%{version}.patch
 Provides:	bundled(libiberty)
 
@@ -38,6 +38,12 @@ This package containes gputils documentation and HTML documentation for supporte
 %patch -P 1 -p0
 
 %build
+# gptypes.h defines an enumeration constant named 'false', which GCC 15 (C23 is
+# its default, as on the fedora-* chroots) rejects with
+#   gptypes.h:30:3: error: cannot use keyword 'false' as enumeration constant
+# Build this 2013-era code as C17, the language it was written for.  el8 and el9
+# default to gnu17/gnu11 and are unaffected.
+export CFLAGS="%{optflags} -std=gnu17"
 autoconf -f -i
 %configure --enable-gdb-debuginfo
 %{__make} %{?_smp_mflags}
