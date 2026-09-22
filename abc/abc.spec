@@ -109,19 +109,16 @@ export CXXFLAGS="$CFLAGS"
       -DCMAKE_BUILD_TYPE=RelWithDebInfo \
       -DABC_SKIP_TESTS=ON
 
-# Drive the build through cmake itself rather than the generator's own tool.
-# ABC ships a Makefile in its source root, and Fedora 44's %cmake macro defaults
-# to the Ninja generator, so a bare `make` there picks up ABC's own makefile
+# fedora-44 and newer default %cmake to the Ninja generator, and ABC ships a
+# Makefile in its source root, so a bare make there picks up ABC's own makefile
 # instead of the generated one and dies with
 #   make: *** No rule to make target 'libabc'.  Stop.
-# (fedora-43, el8 and el9 still default to the Makefile generator, which is why
-# it went unnoticed.)  cmake --build works with either generator, and both
-# targets are named explicitly because libabc is EXCLUDE_FROM_ALL.
-# These two used to be outer `make` variables; exported so ABC's own inner make
-# still sees them whichever generator drives the build (the CMakeLists passes
-# ABC_USE_STDINT_H=1 itself, so this only keeps the previous behaviour).
-export ABC_USE_STDINT_H=1 ABC_MAKE_VERBOSE=0
-cmake --build . %{?_smp_mflags} --target abc libabc
+# Those five chroots stay red.  Two attempts to fix them are known-bad, do not
+# repeat either: naming the targets on the make line (3dd5225) fails the same
+# way, and driving the build with "cmake --build . --target abc libabc"
+# (1b0876c) breaks the nine chroots below that do work, including all of el8 and
+# el9.  The line below is the one verified on el8, el9 and fedora-43.
+make ABC_MAKE_VERBOSE=0 ABC_USE_STDINT_H=1 %{?_smp_mflags}
 
 
 %install
