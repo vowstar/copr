@@ -7,7 +7,7 @@
 
 Name:           %{gstreamer}
 Version:        0.10.36
-Release:        24%{?dist}
+Release:        25%{?dist}
 Summary:        GStreamer streaming media framework runtime
 
 License:        LGPLv2+
@@ -43,7 +43,9 @@ Source1:        gstreamer.prov
 Source2:        gstreamer.attr
 
 ### documentation requirements
-BuildRequires:  python2
+# python2 is vestigial here: it was needed by the old doc toolchain, but
+# nothing in this spec or the Makefiles invokes it, and it is gone from
+# el9/Fedora.  Verified by building on el9 without it (see changelog).
 BuildRequires:  openjade
 BuildRequires:  jadetex
 BuildRequires:  libxslt
@@ -237,6 +239,13 @@ install -m0644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/gstreamer
 %doc %{_datadir}/gtk-doc/html/gstreamer-plugins-%{majorminor}
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 0.10.36-25
+- Drop the vestigial BuildRequires python2: nothing in the spec or the
+  upstream Makefiles invokes it (it belonged to the old doc toolchain,
+  which is disabled), and python2 no longer exists on el9/Fedora.  This
+  single line was what kept the package from building there; verified by
+  rpmbuild -bb in clean rockylinux:8 and rockylinux:9 containers.
+
 * Fri Sep  6 2019 Tom Callaway <spot@fedoraproject.org> - 0.10.36-24
 - disable gtk-docs
 
