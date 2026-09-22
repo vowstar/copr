@@ -1,0 +1,87 @@
+policy_module(ironrdp_server, 1.0.0)
+
+########################################
+#
+# Declarations
+#
+
+## <desc>
+## <p>
+## Domain of the IronRDP RDP server daemon (ironrdp-server.service).
+## </p>
+## </desc>
+#
+type ironrdp_server_t;
+
+## <desc>
+## <p>
+## Executable of the IronRDP RDP server daemon.
+## </p>
+## </desc>
+#
+type ironrdp_server_exec_t;
+
+## <desc>
+## <p>
+## Per-host state of the IronRDP RDP server: TLS certificate and private key.
+## </p>
+## </desc>
+#
+type ironrdp_server_var_lib_t;
+
+## <desc>
+## <p>
+## TCP port type of the RDP service (TCP 3389).
+## </p>
+## </desc>
+#
+type ironrdp_server_port_t;
+
+domain_type(ironrdp_server_t)
+domain_entry_file(ironrdp_server_t, ironrdp_server_exec_t)
+role system_r types ironrdp_server_t;
+
+files_type(ironrdp_server_var_lib_t)
+
+# The distribution policy gives its own RDP server a dedicated port type through
+# network_port(gnome_remote_desktop, tcp,3389-3399,s0) in corenetwork.te.in.
+# An independent module cannot extend corenetwork, and it cannot carry the
+# portcon either -- portcon is a base policy statement and checkmodule rejects it
+# inside a module ("ironrdp_server.te:52:ERROR 'syntax error' at token
+# 'portcon'").  So this module declares the port type, marks it as a network port
+# through corenet_port() and allows the daemon to bind it, while the actual
+# assignment of TCP 3389 to ironrdp_server_port_t is done by semanage(8) from the
+# package's %post, which is the supported way for an independent policy.
+corenet_port(ironrdp_server_port_t)
+
+########################################
+#
+# Local policy
+#
+
+# ironrdp-server.service is installed with NoNewPrivileges=yes, hardened
+# services use init_nnp_daemon_domain() instead of init_daemon_domain().
+init_nnp_daemon_domain(ironrdp_server_t)
+
+# listen on TCP 3389 and serve the RDP/TLS sessions
+allow ironrdp_server_t ironrdp_server_port_t:tcp_socket name_bind;
+corenet_tcp_bind_generic_node(ironrdp_server_t)
+allow ironrdp_server_t self:tcp_socket create_stream_socket_perms;
+allow ironrdp_server_t self:tcp_socket { accept listen };
+allow ironrdp_server_t self:netlink_route_socket r_netlink_socket_perms;
+
+# manage the TLS identity it keeps under /var/lib/ironrdp-server
+manage_dirs_pattern(ironrdp_server_t, ironrdp_server_var_lib_t, ironrdp_server_var_lib_t)
+manage_files_pattern(ironrdp_server_t, ironrdp_server_var_lib_t, ironrdp_server_var_lib_t)
+manage_lnk_files_pattern(ironrdp_server_t, ironrdp_server_var_lib_t, ironrdp_server_var_lib_t)
+files_var_lib_filetrans(ironrdp_server_t, ironrdp_server_var_lib_t, { dir file lnk_file })
+
+# rustls/aws-lc-rs seed their CSPRNG from the kernel
+dev_read_urand(ironrdp_server_t)
+
+files_read_etc_files(ironrdp_server_t)
+miscfiles_read_localization(ironrdp_server_t)
+
+# The daemon logs to stdout/stderr, which systemd forwards to the journal, so no
+# logging interface is needed here.  (logging_write_syslog_pid_socket() is also
+# absent from the el8 selinux-policy-devel, unlike el9.)

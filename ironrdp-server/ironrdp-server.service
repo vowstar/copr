@@ -1,0 +1,42 @@
+[Unit]
+Description=IronRDP RDP server
+Documentation=https://github.com/Devolutions/IronRDP
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ironrdp
+Group=ironrdp
+EnvironmentFile=/etc/sysconfig/ironrdp-server
+# The server has a single fixed credential pair (that is what the IronRDP
+# server skeleton supports today); see /etc/sysconfig/ironrdp-server.
+ExecStart=/usr/bin/ironrdp-server \
+    --bind-addr ${IRONRDP_BIND_ADDR} \
+    --cert ${IRONRDP_CERT} \
+    --key ${IRONRDP_KEY} \
+    --sec ${IRONRDP_SEC} \
+    --user ${IRONRDP_USER} \
+    --pass ${IRONRDP_PASSWORD}
+Restart=on-failure
+RestartSec=5
+
+# ironrdp-server-selinux ships a policy module whose domain transition is built
+# with init_nnp_daemon_domain(), which assumes NNP is switched on here.
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+# only the TLS identity is written at runtime
+ReadWritePaths=/var/lib/ironrdp-server
+
+[Install]
+WantedBy=multi-user.target

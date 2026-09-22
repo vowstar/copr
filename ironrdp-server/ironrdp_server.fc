@@ -1,0 +1,3 @@
+/usr/bin/ironrdp-server			--	gen_context(system_u:object_r:ironrdp_server_exec_t,s0)
+
+/var/lib/ironrdp-server(/.*)?			gen_context(system_u:object_r:ironrdp_server_var_lib_t,s0)
