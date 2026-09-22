@@ -1,13 +1,11 @@
 Name:           libconfuse
-Version:        3.3
-Release:        13%{?dist}
+Version:        3.4
+Release:        1%{?dist}
 Summary:        A configuration file parser library
 
 License:        ISC
-URL:            https://github.com/martinh/libconfuse
-Source0:	https://github.com/martinh/libconfuse/releases/download/v%{version}/confuse-%{version}.tar.gz
-
-Patch0:         d73777c2c3566fb2647727bb56d9a2295b81669b.patch
+URL:            https://github.com/libconfuse/libconfuse
+Source0:	https://github.com/libconfuse/libconfuse/releases/download/v%{version}/confuse-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  check-devel, pkgconfig
@@ -40,8 +38,6 @@ Development files for %{name}.
 %prep
 %setup -q -n confuse-%{version}
 perl -pi.orig -e 's|confuse.h|../src/confuse.h|g' tests/check_confuse.c
-
-%patch -P0 -p0
 
 %build
 %configure --enable-shared --disable-static
@@ -86,6 +82,11 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/doc/confuse
 
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 3.4-1
+- Update to new upstream release 3.4
+- Drop Patch0 (CVE-2022-40320 fix is included in 3.4)
+- Point URL/Source0 at the new libconfuse upstream organization
+
 * Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
