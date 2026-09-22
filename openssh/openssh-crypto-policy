@@ -1,0 +1,105 @@
+#!/bin/sh
+# Audit the system crypto policy against this sshd before it is applied.
+#
+# crypto-policies puts the policy in CRYPTO_POLICY as a list of -o options and
+# the service unit passes it on sshd's command line (el8 mechanism; the variable
+# is set by /etc/crypto-policies/back-ends/opensshserver.config, which the unit
+# reads as an EnvironmentFile, and may be emptied in /etc/sysconfig/sshd to opt
+# out).  Two kinds of entry in it are fatal for an upstream build, because sshd
+# aborts on an unknown -o option or algorithm name:
+#
+#   * options only RHEL's patched openssh has, notably GSSAPIKexAlgorithms from
+#     its GSSAPI-key-exchange patch.  Upstream has GSSAPI authentication but no
+#     GSSAPI key exchange at all, so the option has nothing to configure here
+#     and dropping it loses nothing.
+#   * algorithm names from a policy generated for a newer openssh, e.g.
+#     mlkem1024nistp384-sha384 in the mlkem-capable policies: upstream 10.5
+#     implements ML-KEM-768 only (kexmlkem768x25519.c, kexmlkem768ecdh.c), so
+#     that name -- and only that name -- is dropped from the list.
+#
+# Everything else is passed through unchanged and in the policy's own order, so
+# update-crypto-policies keeps working and nothing has to be pinned.  The test
+# for "does this binary have it" is sshd itself (-T), so the answer cannot drift
+# from the daemon that will run.
+#
+# Failure policy: this script only ever *prints* options.  If it cannot decide,
+# it prints nothing and sshd starts with its own defaults -- a policy that is too
+# new to apply must never stop the daemon from starting.  Everything dropped is
+# logged to stderr, which lands in the journal.
+
+SSHD=/usr/sbin/sshd
+
+policy=${CRYPTO_POLICY:-}
+if [ -z "$policy" ]; then
+    # No policy from crypto-policies (or the admin opted out in
+    # /etc/sysconfig/sshd): pass nothing, add nothing.
+    exit 0
+fi
+
+log() {
+    echo "crypto-policy: $*" >&2
+}
+
+# Option sshd does not implement at all?
+unknown_option() {
+    $SSHD -T -o "$1=x" 2>&1 | grep -q "Bad configuration option"
+}
+
+# Is one algorithm name accepted by this binary?  sshd prints the resulting
+# list, so the name is present only if sshd really took it.
+supported_value() {
+    $SSHD -T -o "$1=$2" 2>/dev/null | grep -i "^$1 " | grep -qF -- "$2"
+}
+
+args=""
+for word in $policy; do
+    case "$word" in
+    -o*=*) ;;
+    *) continue ;;
+    esac
+    option=${word#-o}
+    name=${option%%=*}
+    value=${option#*=}
+
+    if unknown_option "$name"; then
+        log "dropping option $name: this sshd does not implement it"
+        continue
+    fi
+
+    case "$name" in
+    KexAlgorithms | Ciphers | MACs | HostKeyAlgorithms | \
+        HostbasedAcceptedAlgorithms | HostbasedAcceptedKeyTypes | \
+        PubkeyAcceptedAlgorithms | CASignatureAlgorithms)
+        kept=""
+        dropped=""
+        saved_ifs=$IFS
+        IFS=,
+        for alg in $value; do
+            if supported_value "$name" "$alg"; then
+                kept="$kept,$alg"
+            else
+                dropped="$dropped $alg"
+            fi
+        done
+        IFS=$saved_ifs
+        value=${kept#,}
+        if [ -n "$dropped" ]; then
+            log "dropping$dropped from $name: not implemented by this sshd"
+        fi
+        if [ -z "$value" ]; then
+            log "dropping option $name: no value this sshd supports"
+            continue
+        fi
+        ;;
+    esac
+
+    args="$args -o $name=$value"
+done
+
+if [ -n "$args" ] && ! $SSHD -T $args >/dev/null 2>&1; then
+    log "filtered policy still rejected by sshd, starting without any policy:"
+    $SSHD -T $args 2>&1 | sed 's/^/crypto-policy: /' >&2
+    exit 0
+fi
+
+printf '%s\n' $args

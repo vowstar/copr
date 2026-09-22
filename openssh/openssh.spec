@@ -21,11 +21,18 @@
 # options deliberately left out are --with-rsh (rsh/rlogin clients, obsolete) and
 # --enable-dsa-keys (upstream removed DSA in 10.0 and it is weak anyway).
 #
-# GSSAPI is not optional in practice: without it sshd rejects the
-# -oGSSAPIKexAlgorithms=... option that RHEL 8/9 crypto-policies put on its
-# command line (an unknown -o option is fatal, unlike one in sshd_config) and the
-# service never starts.  FIDO likewise must match the policy: the current
-# crypto-policies list sk-ecdsa-sha2-nistp256@openssh.com and
+# The crypto-policies back-end file is written for RHEL's patched openssh and
+# contains items an upstream build does not implement: GSSAPIKexAlgorithms (from
+# RHEL's GSSAPI-key-exchange patch -- upstream has GSSAPI authentication but no
+# GSSAPI key exchange at all, --with-kerberos5 does not provide that option) and,
+# in the newer policies, algorithm names such as mlkem1024nistp384-sha384
+# (upstream 10.5 implements ML-KEM-768 only).  An unknown -o option or algorithm
+# name given on the command line is fatal, unlike one in the config file, so the
+# policy is audited against the built binary by
+# %{_libexecdir}/openssh/crypto-policy-args before it reaches sshd: unsupported
+# options and names are dropped and logged, and the daemon still starts when the
+# host's policy is newer than this build.  FIDO likewise must match the policy:
+# crypto-policies lists sk-ecdsa-sha2-nistp256@openssh.com and
 # sk-ssh-ed25519@openssh.com among the accepted host key / pubkey / CA
 # signature algorithms.
 #
@@ -36,7 +43,7 @@
 
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        An open source implementation of SSH protocol version 2
 
 License:        BSD-3-Clause AND BSD-2-Clause AND ISC AND SSH-OpenSSH AND ssh-keyscan AND snprintf
@@ -53,6 +60,10 @@ Source6:        sshd-keygen@.service
 Source7:        sshd-keygen.target
 Source8:        sshd-keygen
 Source9:        sshd.tmpfiles
+# The crypto-policies audit and the service drop-in that routes the unit through
+# it (see the comment at the top of this file).
+Source10:       openssh-crypto-policy
+Source11:       sshd-service-crypto-policy.conf
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -169,6 +180,9 @@ install -p -m 0644 %{SOURCE6} %{buildroot}%{_unitdir}/sshd-keygen@.service
 install -p -m 0644 %{SOURCE7} %{buildroot}%{_unitdir}/sshd-keygen.target
 install -d -m 0755 %{buildroot}%{_libexecdir}/openssh
 install -p -m 0744 %{SOURCE8} %{buildroot}%{_libexecdir}/openssh/sshd-keygen
+install -p -m 0755 %{SOURCE10} %{buildroot}%{_libexecdir}/openssh/crypto-policy-args
+install -d -m 0755 %{buildroot}%{_unitdir}/sshd.service.d
+install -p -m 0644 %{SOURCE11} %{buildroot}%{_unitdir}/sshd.service.d/10-crypto-policy.conf
 install -d -m 0755 %{buildroot}%{_tmpfilesdir}
 install -p -m 0644 %{SOURCE9} %{buildroot}%{_tmpfilesdir}/openssh.conf
 
@@ -246,6 +260,7 @@ exit 0
 %attr(0755,root,root) %{_libexecdir}/openssh/sshd-keygen
 %attr(0755,root,root) %{_libexecdir}/openssh/sshd-session
 %attr(0755,root,root) %{_libexecdir}/openssh/sshd-auth
+%attr(0755,root,root) %{_libexecdir}/openssh/crypto-policy-args
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config
 %dir %{_sysconfdir}/ssh/sshd_config.d
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/sshd
@@ -255,12 +270,30 @@ exit 0
 %attr(0644,root,root) %{_unitdir}/sshd.socket
 %attr(0644,root,root) %{_unitdir}/sshd-keygen@.service
 %attr(0644,root,root) %{_unitdir}/sshd-keygen.target
+%dir %{_unitdir}/sshd.service.d
+%attr(0644,root,root) %{_unitdir}/sshd.service.d/10-crypto-policy.conf
 %attr(0644,root,root) %{_tmpfilesdir}/openssh.conf
 %{_mandir}/man5/sshd_config.5*
 %{_mandir}/man8/sshd.8*
 %{_mandir}/man8/sftp-server.8*
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-4
+- Audit the system crypto policies against the built binary instead of handing
+  them to sshd verbatim.  GSSAPIKexAlgorithms is not an upstream option at all:
+  it belongs to RHEL's GSSAPI-key-exchange patch, a feature upstream does not
+  have (GSSAPIKeyExchange appears nowhere in the 10.5 tree), so --with-kerberos5
+  from -2 does not make sshd accept it and the daemon still refused to start.
+  The newer policies also carry kex names this build does not implement
+  (mlkem1024nistp384-sha384; 10.5 has ML-KEM-768 only).  Both are dropped now,
+  each with a journal line, while the rest of the policy -- the mlkem768 kexes
+  included -- is applied unchanged.
+- The audit is %{_libexecdir}/openssh/crypto-policy-args plus a drop-in for
+  sshd.service, which asks the daemon itself (sshd -T) what it supports, so the
+  answer cannot drift from the binary that runs.  It prints no policy options at
+  all if it cannot decide, so a policy newer than this build can never keep the
+  daemon from starting.
+
 * Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-3
 - Enable the rest of the feature set RHEL 9 builds: FIDO/U2F security keys
   (--with-security-key-builtin, libfido2-devel), libedit, PKCS#11
