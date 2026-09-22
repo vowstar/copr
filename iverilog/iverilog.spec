@@ -1,6 +1,6 @@
 %global pkgvers 0
-%global scdate0 20221127
-%global schash0 4fd5291632232fbe1ba49b2c26bb6b2bf1c6c9cf
+%global scdate0 20260301
+%global schash0 dfeee909ed9f20b4870dd93423156c0170c0e1ff
 %global branch0 master
 %global source0 https://github.com/steveicarus/iverilog.git
 
@@ -65,6 +65,9 @@ install
 
 
 %changelog
+* Tue Sep 22 2026 Cristian Balint <cristian.balint@gmail.com> - 13.0
+- Update git pin to upstream v13_0 (dfeee909)
+
 * Sat Feb 06 2021 Cristian Balint <cristian.balint@gmail.com>
 - upstream git builds
 
