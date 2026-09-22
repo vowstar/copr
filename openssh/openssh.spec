@@ -43,7 +43,7 @@
 
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        An open source implementation of SSH protocol version 2
 
 License:        BSD-3-Clause AND BSD-2-Clause AND ISC AND SSH-OpenSSH AND ssh-keyscan AND snprintf
@@ -66,6 +66,9 @@ Source10:       openssh-crypto-policy
 Source11:       sshd-service-crypto-policy.conf
 # Red Hat's el8 sshd_config, for the reason spelled out in the install section.
 Source12:       sshd_config
+# ... and the same audit for the socket-activated unit, which runs sshd -i per
+# connection and would otherwise be handed the raw policy too.
+Source13:       sshd-at-service-crypto-policy.conf
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -185,6 +188,8 @@ install -p -m 0744 %{SOURCE8} %{buildroot}%{_libexecdir}/openssh/sshd-keygen
 install -p -m 0755 %{SOURCE10} %{buildroot}%{_libexecdir}/openssh/crypto-policy-args
 install -d -m 0755 %{buildroot}%{_unitdir}/sshd.service.d
 install -p -m 0644 %{SOURCE11} %{buildroot}%{_unitdir}/sshd.service.d/10-crypto-policy.conf
+install -d -m 0755 %{buildroot}%{_unitdir}/sshd@.service.d
+install -p -m 0644 %{SOURCE13} %{buildroot}%{_unitdir}/sshd@.service.d/10-crypto-policy.conf
 install -d -m 0755 %{buildroot}%{_tmpfilesdir}
 install -p -m 0644 %{SOURCE9} %{buildroot}%{_tmpfilesdir}/openssh.conf
 
@@ -232,6 +237,10 @@ for key in %{_sysconfdir}/ssh/ssh_host_*_key; do
     chown root:root "$key" 2>/dev/null || :
     chmod 0600 "$key" 2>/dev/null || :
 done
+# Have systemd pick this package's unit files and drop-ins up right away: a start
+# issued between the install and the next reload would otherwise use the cached
+# ExecStart and hand sshd the unfiltered policy.
+systemctl daemon-reload >/dev/null 2>&1 || :
 
 %preun server
 %systemd_preun sshd.service sshd.socket
@@ -292,12 +301,24 @@ done
 %attr(0644,root,root) %{_unitdir}/sshd-keygen.target
 %dir %{_unitdir}/sshd.service.d
 %attr(0644,root,root) %{_unitdir}/sshd.service.d/10-crypto-policy.conf
+%dir %{_unitdir}/sshd@.service.d
+%attr(0644,root,root) %{_unitdir}/sshd@.service.d/10-crypto-policy.conf
 %attr(0644,root,root) %{_tmpfilesdir}/openssh.conf
 %{_mandir}/man5/sshd_config.5*
 %{_mandir}/man8/sshd.8*
 %{_mandir}/man8/sftp-server.8*
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-9
+- Cover the socket-activated unit as well: sshd@.service runs sshd -i per
+  connection and is not affected by a drop-in for sshd.service, so enabling
+  sshd.socket would have handed every connection the unfiltered policy.  It gets
+  the same audit now.
+- Ask for a daemon-reload explicitly at the end of %%post, so that a start issued
+  between the install and systemd's next reload cannot use the cached ExecStart
+  and hit sshd with the unfiltered policy (seen once in a container whose
+  systemctl was not fully functional).
+
 * Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-8
 - Make the spec parse on el8's rpm.  The word "%%install" inside a comment is
   taken as a section header there ("error: line 166: second %%install"), which
