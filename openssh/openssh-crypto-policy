@@ -18,14 +18,15 @@
 #     that name -- and only that name -- is dropped from the list.
 #
 # Everything else is passed through unchanged and in the policy's own order, so
-# update-crypto-policies keeps working and nothing has to be pinned.  The test
-# for "does this binary have it" is sshd itself (-T), so the answer cannot drift
-# from the daemon that will run.
+# update-crypto-policies keeps working and nothing has to be pinned.
 #
-# Failure policy: this script only ever *prints* options.  If it cannot decide,
-# it prints nothing and sshd starts with its own defaults -- a policy that is too
-# new to apply must never stop the daemon from starting.  Everything dropped is
-# logged to stderr, which lands in the journal.
+# Each entry is tried against the daemon itself, on a private throwaway
+# configuration, so the answer is about this binary and the policy entry alone:
+# the host's sshd_config and its host keys cannot make a good entry look bad (an
+# unreadable host key makes a plain "sshd -T" fail outright, with no output to
+# judge by).  Nothing is ever dropped because of the host's own state.
+#
+# Everything dropped is logged to stderr, which lands in the journal.
 
 SSHD=/usr/sbin/sshd
 
@@ -40,15 +41,52 @@ log() {
     echo "crypto-policy: $*" >&2
 }
 
+# A configuration of our own, holding nothing but a throwaway host key, so that
+# probing does not depend on /etc/ssh at all.
+probe_dir=$(mktemp -d) || exit 0
+trap 'rm -rf "$probe_dir"' EXIT
+ssh-keygen -q -t ed25519 -N '' -f "$probe_dir/hostkey" >/dev/null 2>&1 || exit 0
+printf 'HostKey %s\n' "$probe_dir/hostkey" >"$probe_dir/sshd_config"
+
+probe="$SSHD -T -f $probe_dir/sshd_config"
+
 # Option sshd does not implement at all?
 unknown_option() {
-    $SSHD -T -o "$1=x" 2>&1 | grep -q "Bad configuration option"
+    $probe -o "$1=x" 2>&1 | grep -q "Bad configuration option"
 }
 
-# Is one algorithm name accepted by this binary?  sshd prints the resulting
-# list, so the name is present only if sshd really took it.
-supported_value() {
-    $SSHD -T -o "$1=$2" 2>/dev/null | grep -i "^$1 " | grep -qF -- "$2"
+# Does sshd take this option with this value?  Judged from the configuration it
+# prints, never from stderr.
+takes_option() {
+    $probe -o "$1=$2" 2>/dev/null | grep -iq "^$1 "
+}
+
+# Same question for one algorithm name inside a list-valued option.
+takes_algorithm() {
+    $probe -o "$1=$2" 2>/dev/null | grep -i "^$1 " | grep -qF -- "$2"
+}
+
+is_list_option() {
+    case "$1" in
+    KexAlgorithms | Ciphers | MACs | HostKeyAlgorithms | \
+        HostbasedAcceptedAlgorithms | HostbasedAcceptedKeyTypes | \
+        PubkeyAcceptedAlgorithms | PubkeyAcceptedKeyTypes | \
+        CASignatureAlgorithms)
+        return 0
+        ;;
+    *) return 1 ;;
+    esac
+}
+
+# The el8 crypto policies still use the pre-8.5 names for two options, which
+# this build no longer knows.  Renaming them keeps the restriction the policy
+# asks for instead of dropping it; sshd resolves the new name below.
+rename_option() {
+    case "$1" in
+    PubkeyAcceptedKeyTypes) echo PubkeyAcceptedAlgorithms ;;
+    HostbasedAcceptedKeyTypes) echo HostbasedAcceptedAlgorithms ;;
+    *) echo "$1" ;;
+    esac
 }
 
 args=""
@@ -60,28 +98,30 @@ for word in $policy; do
     option=${word#-o}
     name=${option%%=*}
     value=${option#*=}
+    name=$(rename_option "$name")
 
     if unknown_option "$name"; then
         log "dropping option $name: this sshd does not implement it"
         continue
     fi
 
-    case "$name" in
-    KexAlgorithms | Ciphers | MACs | HostKeyAlgorithms | \
-        HostbasedAcceptedAlgorithms | HostbasedAcceptedKeyTypes | \
-        PubkeyAcceptedAlgorithms | CASignatureAlgorithms)
+    if is_list_option "$name"; then
         kept=""
         dropped=""
+        # Split on commas, then put IFS back immediately: the probes below expand
+        # $probe, and a comma IFS would keep them from being word split (which
+        # would make every algorithm look unsupported).
         saved_ifs=$IFS
         IFS=,
-        for alg in $value; do
-            if supported_value "$name" "$alg"; then
+        set -- $value
+        IFS=$saved_ifs
+        for alg in "$@"; do
+            if takes_algorithm "$name" "$alg"; then
                 kept="$kept,$alg"
             else
                 dropped="$dropped $alg"
             fi
         done
-        IFS=$saved_ifs
         value=${kept#,}
         if [ -n "$dropped" ]; then
             log "dropping$dropped from $name: not implemented by this sshd"
@@ -90,16 +130,12 @@ for word in $policy; do
             log "dropping option $name: no value this sshd supports"
             continue
         fi
-        ;;
-    esac
+    elif ! takes_option "$name" "$value"; then
+        log "dropping option $name=$value: this sshd does not accept it"
+        continue
+    fi
 
     args="$args -o $name=$value"
 done
-
-if [ -n "$args" ] && ! $SSHD -T $args >/dev/null 2>&1; then
-    log "filtered policy still rejected by sshd, starting without any policy:"
-    $SSHD -T $args 2>&1 | sed 's/^/crypto-policy: /' >&2
-    exit 0
-fi
 
 printf '%s\n' $args

@@ -43,7 +43,7 @@
 
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        An open source implementation of SSH protocol version 2
 
 License:        BSD-3-Clause AND BSD-2-Clause AND ISC AND SSH-OpenSSH AND ssh-keyscan AND snprintf
@@ -298,6 +298,22 @@ done
 %{_mandir}/man8/sftp-server.8*
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-7
+- crypto-policy-args: audit each policy entry against a private throwaway
+  configuration instead of the host's, so the host's sshd_config and host keys
+  cannot influence the answer -- an unreadable host key makes a plain "sshd -T"
+  fail with no output to judge by, which made the script drop the entire policy
+  (and print the daemon's key errors prefixed with "crypto-policy:", pointing the
+  reader at the wrong thing).  The give-up path that discarded everything is
+  gone: an entry is dropped only when the daemon itself refuses that entry.
+- Also: restore IFS before probing (the comma IFS used to split the list kept the
+  probe from being word split, so every algorithm looked unsupported), and
+  translate the pre-8.5 option names the el8 policies still use
+  (PubkeyAcceptedKeyTypes, HostbasedAcceptedKeyTypes) to the names this build
+  knows, instead of dropping that restriction.
+  Verified against the el8 stock policy with deliberately unreadable host keys:
+  six options kept, only GSSAPIKexAlgorithms dropped.
+
 * Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-6
 - Ship Red Hat's el8 sshd_config instead of upstream's.  RPM replaces an
   unmodified %config file, and upstream's sshd_config has its defaults commented
