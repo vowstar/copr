@@ -137,7 +137,9 @@ default configuration and the helper that generates the host keys.
     --with-security-key-builtin=yes \
     --with-libedit \
     --with-default-pkcs11-provider=yes \
+%if 0%{?rhel} == 8
     --with-ssl-engine \
+%endif
     --with-ipv4-default \
     --enable-vendor-patchlevel=eda \
     --with-selinux \
