@@ -46,10 +46,13 @@
 %global with_docs 0
 
 # Verilator's build scripts (astgen) need Python >= 3.8; the distro python3 is
-# 3.6 on both el7 and el8.  Pick the newest python3.x on PATH, and fall back to
-# plain python3 (correct on COPR/Fedora, and on ucun1 via the private
-# /home/vowstar/opt/python3.11 that is put on PATH for the build).
-%global buildpy %(for v in 3.13 3.12 3.11 3.10 3.9 3.8; do p=$(command -v python$v 2>/dev/null) && { echo "$p"; exit 0; }; done; command -v python3 2>/dev/null)
+# 3.6 on both el7 and el8.  Pick the newest python3.x in %{_bindir}; the default
+# is plain python3 (correct on COPR/Fedora, and on ucun1 via the private
+# /home/vowstar/opt/python3.11 -- override the macro explicitly when building
+# there:  rpmbuild -bb --define 'buildpy /home/vowstar/opt/python3.11/bin/python3' SPECS/verilator.spec
+# No nested command substitution here on purpose: COPR builds SRPMs with rpkg,
+# whose spec parser trips over $( ) nested inside %( ).
+%global buildpy %(p=%{_bindir}/python3; for v in 3.13 3.12 3.11 3.10 3.9 3.8; do if [ -x %{_bindir}/python$v ]; then p=%{_bindir}/python$v; break; fi; done; echo $p)
 
 Name:           verilator
 Version:        5.052
@@ -113,9 +116,11 @@ embedded software design teams.
 . /opt/rh/devtoolset-11/enable
 export LDFLAGS="%{?__global_ldflags} -static-libstdc++ -static-libgcc"
 %endif
-export PATH="$(dirname %{buildpy}):$PATH"
-%{buildpy} -c 'import sys; sys.exit(0 if sys.version_info >= (3, 8) else 1)' || {
-    echo "ERROR: verilator's build scripts need python3 >= 3.8, found %{buildpy}"; exit 1; }
+export PATH=%{_bindir}:$PATH
+if ! %{buildpy} -c 'import sys; sys.exit(0 if sys.version_info >= (3, 8) else 1)'; then
+    echo "ERROR: verilator's build scripts need python3 >= 3.8, found %{buildpy}"
+    exit 1
+fi
 # PYTHON3 must not be in the environment when ./configure runs: configure.ac
 # does AC_CHECK_PROG(PYTHON3,python3,python3), which keeps an inherited value,
 # and @PYTHON3@ is substituted into include/verilated.mk, which the *installed*
@@ -151,10 +156,12 @@ mkdir -p %{_builddir}/pypath
 ln -sf %{buildpy} %{_builddir}/pypath/python3
 %{__tar} xf %{SOURCE1} -C %{_builddir}
 export PYTHONPATH=%{_builddir}/distro-1.9.0/src${PYTHONPATH:+:$PYTHONPATH}
-export PATH="%{_builddir}/pypath:$(dirname %{buildpy}):$PATH"
-%{buildpy} -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' || {
+export PATH=%{_builddir}/pypath:%{_bindir}:$PATH
+if ! %{buildpy} -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)'; then
     echo "ERROR: verilator's test driver needs python3 >= 3.10 (it uses structural"
-    echo "pattern matching), found %{buildpy}"; exit 1; }
+    echo "pattern matching), found %{buildpy}"
+    exit 1
+fi
 MAKEFLAGS=
 %{__make} -j%{buildjobs} PYTHON3=%{buildpy} test
 
