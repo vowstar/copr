@@ -60,6 +60,19 @@ Source4:        %{name}.sysconfig
 
 BuildRequires:  gcc-c++
 BuildRequires:  make
+# %%{_unitdir} and %%systemd_post/%%systemd_preun/%%systemd_postun_with_restart
+# come from /usr/lib/rpm/macros.d/macros.systemd, which mock's minimal buildroot
+# does not have: without this the el8/epel-8 chroots died with
+#   error: File must begin with "/": %{_unitdir}/ironrdp-server.service
+# On el8 that file belongs to the systemd package itself (el8 has no
+# systemd-rpm-macros); on el9 and Fedora it is split out into systemd-rpm-macros.
+# The %% above must stay escaped: rpm expands macros inside comments, and
+# %%systemd_post expands to a multi-line shell fragment that breaks the parse.
+%if 0%{?rhel} == 8
+BuildRequires:  systemd
+%else
+BuildRequires:  systemd-rpm-macros
+%endif
 # aws-lc-sys (rustls' default crypto provider) is built from C sources
 BuildRequires:  cmake
 # the rdpsnd handler encodes OPUS through opus2/libopus
