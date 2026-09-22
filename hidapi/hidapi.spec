@@ -1,6 +1,13 @@
 Name:           hidapi
-Version:        0.14.0
-Release:        6%{?dist}
+Version:        0.15.0
+Release:        1%{?dist}
+# The mingw cross subpackages need a Fedora/EL9-era mingw-filesystem
+# (EL8 ships 104: no %mingw_make_build, and %mingw32_pkg_name does not
+# prefix a non-"mingw-" package name). Build them only where they work.
+%global with_mingw 1
+%if 0%{?rhel} && 0%{?rhel} < 9
+%global with_mingw 0
+%endif
 Summary:        Library for communicating with USB and Bluetooth HID devices
  
 License:        GPL-3.0-only OR BSD-3-Clause
@@ -13,6 +20,7 @@ BuildRequires: gcc
 BuildRequires: libudev-devel
 BuildRequires: libusb1-devel
  
+%if %{with_mingw}
 BuildRequires: mingw32-filesystem >= 95
 BuildRequires: mingw32-gcc
 BuildRequires: mingw32-binutils
@@ -20,6 +28,7 @@ BuildRequires: mingw32-binutils
 BuildRequires: mingw64-filesystem >= 95
 BuildRequires: mingw64-gcc
 BuildRequires: mingw64-binutils
+%endif
  
 %global _description %{expand:
 HIDAPI is a multi-platform library which allows an application to interface
@@ -36,6 +45,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 This package contains development files for hidapi which provides access to
 USB and Bluetooth HID-class devices.
  
+%if %{with_mingw}
 %package -n mingw32-hidapi
 Summary:        %{summary}
 Obsoletes:      mingw32-hidapi-static < 0.11.2-6
@@ -47,6 +57,7 @@ Obsoletes:      mingw64-hidapi-static < 0.11.2-6
  
 %description -n mingw64-hidapi %_description
 %{?mingw_debug_package}
+%endif
  
  
 %prep
@@ -56,13 +67,17 @@ Obsoletes:      mingw64-hidapi-static < 0.11.2-6
 %build
 %cmake
 %cmake_build
+%if %{with_mingw}
 %mingw_cmake
 %mingw_make_build
+%endif
  
 %install
 %cmake_install
+%if %{with_mingw}
 %mingw_make_install
 %mingw_debug_install_post
+%endif
  
 %files
 %doc AUTHORS.txt README.md LICENSE*.txt
@@ -76,6 +91,7 @@ Obsoletes:      mingw64-hidapi-static < 0.11.2-6
 %{_libdir}/pkgconfig/hidapi-hidraw.pc
 %{_libdir}/pkgconfig/hidapi-libusb.pc
  
+%if %{with_mingw}
 %files -n mingw32-hidapi
 %doc AUTHORS.txt README.md LICENSE*.txt
 %{mingw32_libdir}/cmake/hidapi
@@ -91,8 +107,12 @@ Obsoletes:      mingw64-hidapi-static < 0.11.2-6
 %{mingw64_libdir}/libhidapi.dll.a
 %{mingw64_libdir}/pkgconfig/hidapi.pc
 %{mingw64_includedir}/hidapi
+%endif
  
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 0.15.0-1
+- Update to new upstream release 0.15.0
+
 * Wed Jul 31 2024 Scott Talbert <swt@techie.net> - 0.14.0-6
 - Update License tag to use SPDX identifiers
  
