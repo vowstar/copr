@@ -109,7 +109,12 @@ export CXXFLAGS="$CFLAGS"
       -DCMAKE_BUILD_TYPE=RelWithDebInfo \
       -DABC_SKIP_TESTS=ON
 
-make ABC_MAKE_VERBOSE=0 ABC_USE_STDINT_H=1 %{?_smp_mflags}
+# abc's CMakeLists declares libabc with EXCLUDE_FROM_ALL -- it used to come out
+# anyway as a dependency of the abc binary, but with cmake 4 (fedora-44 and
+# newer) it no longer does and %install then found no libabc.so.0.0.0.  Ask for
+# both targets explicitly so the shared library the package ships is always
+# built, on every chroot and every cmake generation.
+make ABC_MAKE_VERBOSE=0 ABC_USE_STDINT_H=1 %{?_smp_mflags} abc libabc
 
 
 %install
