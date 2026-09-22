@@ -29,7 +29,7 @@
 # (upstream 10.5 implements ML-KEM-768 only).  An unknown -o option or algorithm
 # name given on the command line is fatal, unlike one in the config file, so the
 # policy is audited against the built binary by
-# %{_libexecdir}/openssh/crypto-policy-args before it reaches sshd: unsupported
+# %%{_libexecdir}/openssh/crypto-policy-args before it reaches sshd: unsupported
 # options and names are dropped and logged, and the daemon still starts when the
 # host's policy is newer than this build.  FIDO likewise must match the policy:
 # crypto-policies lists sk-ecdsa-sha2-nistp256@openssh.com and
@@ -43,7 +43,7 @@
 
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        An open source implementation of SSH protocol version 2
 
 License:        BSD-3-Clause AND BSD-2-Clause AND ISC AND SSH-OpenSSH AND ssh-keyscan AND snprintf
@@ -64,7 +64,7 @@ Source9:        sshd.tmpfiles
 # it (see the comment at the top of this file).
 Source10:       openssh-crypto-policy
 Source11:       sshd-service-crypto-policy.conf
-# Red Hat's el8 sshd_config, for the reason spelled out in %install.
+# Red Hat's el8 sshd_config, for the reason spelled out in the install section.
 Source12:       sshd_config
 
 BuildRequires:  gcc
@@ -194,13 +194,13 @@ install -p -m 0755 contrib/ssh-copy-id %{buildroot}%{_bindir}/ssh-copy-id
 install -d -m 0755 %{buildroot}%{_mandir}/man1
 install -p -m 0644 contrib/ssh-copy-id.1 %{buildroot}%{_mandir}/man1/ssh-copy-id.1
 
-# upstream installs sshd_config and ssh_config into %{_sysconfdir}/ssh; keep the
+# upstream installs sshd_config and ssh_config into %%{_sysconfdir}/ssh; keep the
 # distribution's permissions and make sure the drop-in include directories the
 # units and RHEL conventions expect exist
 install -d -m 0755 %{buildroot}%{_sysconfdir}/ssh/sshd_config.d
 install -d -m 0755 %{buildroot}%{_sysconfdir}/ssh/ssh_config.d
 # ... and ship Red Hat's sshd_config rather than upstream's.  Upstream's file has
-# its defaults commented out, and RPM replaces an unmodified %config file, so on
+# its defaults commented out, and RPM replaces an unmodified %%config file, so on
 # a host upgraded from the distribution's openssh upstream's file silently drops
 # UsePAM yes, PermitRootLogin yes, X11Forwarding yes, GSSAPIAuthentication yes,
 # SyslogFacility AUTHPRIV and the AcceptEnv locale forwarding -- PAM off is not
@@ -298,6 +298,14 @@ done
 %{_mandir}/man8/sftp-server.8*
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-8
+- Make the spec parse on el8's rpm.  The word "%%install" inside a comment is
+  taken as a section header there ("error: line 166: second %%install"), which
+  failed every EL chroot of -7 while all five Fedora chroots passed; macros in
+  comments are escaped as %%%% for the same reason (the hidapi spec in this
+  repository carries the same warning).  Verified by parsing the spec with
+  rpmspec in a rockylinux:8 container before building.
+
 * Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-7
 - crypto-policy-args: audit each policy entry against a private throwaway
   configuration instead of the host's, so the host's sshd_config and host keys
