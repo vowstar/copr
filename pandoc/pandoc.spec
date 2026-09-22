@@ -1,5 +1,5 @@
 Name:           pandoc
-Version:        3.7.0.2
+Version:        3.11
 Release:        1%{?dist}
 Summary:        Pandoc is a universal document converter. It can convert between various markup formats including Markdown, HTML, LaTeX, PDF, and more.
 
