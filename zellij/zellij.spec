@@ -15,10 +15,15 @@ BuildRequires: cmake
 BuildRequires: openssl-devel
 BuildRequires: perl-devel
 BuildRequires: openssl-perl
-%if 0%{?rhel} < 9
-BuildRequires:  perl-interpreter
-%else
+# openssl-src builds a vendored OpenSSL whose Configure script does
+# "use FindBin".  On el7/el8 (perl 5.16/5.26) FindBin ships in the perl
+# interpreter package; on el9 and on Fedora it is the separate perl-FindBin
+# package -- Fedora's perl-interpreter does not provide it, which is why the
+# fedora-* chroots failed with "Can't locate FindBin.pm in @INC".
+%if 0%{?fedora} || 0%{?rhel} >= 9
 BuildRequires:  perl-FindBin
+%else
+BuildRequires:  perl-interpreter
 %endif
 BuildRequires: perl-IPC-Cmd
 BuildRequires: perl-Time-Piece
