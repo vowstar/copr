@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:       typst
-Version:    0.13.1
+Version:    0.15.1
 Release:    1%{?dist}
 Summary:    A new markup-based typesetting system that is powerful and easy to learn.
 
@@ -34,7 +34,7 @@ curl https://sh.rustup.rs -sSf | sh -s -- --profile minimal --default-toolchain 
 %build
 export CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_OPT_LEVEL=3
 export PATH="$HOME/.cargo/bin:$PATH"
-$HOME/.cargo/bin/rustup default 1.87.0
+$HOME/.cargo/bin/rustup default 1.92.0
 $HOME/.cargo/bin/cargo build -p typst-cli --release --all-features --locked
 
 %install
