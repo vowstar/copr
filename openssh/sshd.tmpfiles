@@ -1,1 +1,9 @@
 d /var/empty/sshd 711 root root -
+# Red Hat's sshd-keygen creates the host keys 0640 root:ssh_keys, for RHEL's
+# keyperm patch.  This build has no such patch, and upstream's sshd rejects a
+# group readable private key ("no hostkeys available -- exiting"), so host keys
+# left over from the distribution's openssh would keep the daemon from starting
+# after an upgrade.  Normalizing them to 0600 root:root is accepted by both
+# implementations.  The spec's %post does the same thing right away, so the
+# service is fine before the next boot as well.
+z /etc/ssh/ssh_host_*_key 0600 root root -

@@ -43,7 +43,7 @@
 
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        An open source implementation of SSH protocol version 2
 
 License:        BSD-3-Clause AND BSD-2-Clause AND ISC AND SSH-OpenSSH AND ssh-keyscan AND snprintf
@@ -212,6 +212,17 @@ exit 0
 
 %post server
 %systemd_post sshd.service sshd.socket
+# Host keys left over from the distribution's openssh are 0640 root:ssh_keys
+# (Red Hat's keyperm patch and its sshd-keygen), and this build has no such
+# patch: upstream's sshd refuses a group readable private key and then exits with
+# "no hostkeys available", so the daemon would not come back up after this
+# upgrade.  Normalize them now, and sshd.tmpfiles keeps them that way on every
+# boot.  Both implementations accept 0600 root:root.
+for key in %{_sysconfdir}/ssh/ssh_host_*_key; do
+    [ -f "$key" ] || continue
+    chown root:root "$key" 2>/dev/null || :
+    chmod 0600 "$key" 2>/dev/null || :
+done
 
 %preun server
 %systemd_preun sshd.service sshd.socket
@@ -278,6 +289,20 @@ exit 0
 %{_mandir}/man8/sftp-server.8*
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-5
+- Normalize host keys left over from the distribution to 0600 root:root, in
+  %post and through sshd.tmpfiles.  Red Hat's sshd-keygen creates them
+  0640 root:ssh_keys for its keyperm patch, which this build does not carry, and
+  upstream's sshd refuses a group readable private key: on a host upgraded from
+  the distribution's openssh the daemon could not start at all --
+    Permissions 0640 for '/etc/ssh/ssh_host_ed25519_key' are too open.
+    sshd: no hostkeys available -- exiting.
+    sshd.service: Main process exited, code=exited, status=1/FAILURE
+  0600 root:root is accepted by both implementations.  Found by upgrading a real
+  systemd container from the distribution's 8.0p1 to 10.5p1-4; with the keys
+  fixed the same unit starts and listens on 22, with the crypto policies audited
+  by crypto-policy-args in the journal.
+
 * Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-4
 - Audit the system crypto policies against the built binary instead of handing
   them to sshd verbatim.  GSSAPIKexAlgorithms is not an upstream option at all:
