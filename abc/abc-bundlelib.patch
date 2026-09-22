@@ -1,18 +1,18 @@
 diff --git a/Makefile b/Makefile
-index 0cc979b..9d28446 100644
+index b583f7d..e7868f7 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -22,7 +22,7 @@ MODULES := \
+@@ -39,7 +39,7 @@ MODULES := \
  	src/map/mapper src/map/mio src/map/super src/map/if src/map/if/acd \
- 	src/map/amap src/map/cov src/map/scl src/map/mpm \
+ 	src/map/amap src/map/cov src/map/scl src/map/mpm src/map/emap \
  	src/misc/extra src/misc/mvc src/misc/st src/misc/util src/misc/nm \
 -	src/misc/vec src/misc/hash src/misc/tim src/misc/bzlib src/misc/zlib \
 +	src/misc/vec src/misc/hash src/misc/tim \
- 	src/misc/mem src/misc/bar src/misc/bbl src/misc/parse \
+ 	src/misc/mem src/misc/bar src/misc/bbl src/misc/parse src/misc/btor \
  	src/opt/cut src/opt/fxu src/opt/fxch src/opt/rwr src/opt/mfs src/opt/sim \
- 	src/opt/ret src/opt/fret src/opt/res src/opt/lpk src/opt/nwk src/opt/rwt \
-@@ -44,6 +44,7 @@ $(ARCHFLAGS_EXE) : arch_flags.c
- 	$(CC) arch_flags.c -o $(ARCHFLAGS_EXE)
+ 	src/opt/ret src/opt/fret src/opt/res src/opt/lpk src/opt/nwk src/opt/rwt src/opt/rar \
+@@ -78,6 +78,7 @@ $(ARCHFLAGS_EXE) : arch_flags.c
+ 	$(CC) $< -o $(ARCHFLAGS_EXE)
  
  INCLUDES += -I$(ABCSRC)/src
 +LIBS=-lbz2 -lz
@@ -20,7 +20,7 @@ index 0cc979b..9d28446 100644
  # Use C99 stdint.h header for platform-dependent types
  ifdef ABC_USE_STDINT_H
 diff --git a/src/base/io/ioReadAiger.c b/src/base/io/ioReadAiger.c
-index 9cf4141..73f1487 100644
+index 200247b..af12c32 100644
 --- a/src/base/io/ioReadAiger.c
 +++ b/src/base/io/ioReadAiger.c
 @@ -26,8 +26,8 @@
@@ -35,7 +35,7 @@ index 9cf4141..73f1487 100644
  
  ABC_NAMESPACE_IMPL_START
 diff --git a/src/base/io/ioReadBlifMv.c b/src/base/io/ioReadBlifMv.c
-index c8c1458..0080fd1 100644
+index 05fc5d2..afbb237 100644
 --- a/src/base/io/ioReadBlifMv.c
 +++ b/src/base/io/ioReadBlifMv.c
 @@ -18,8 +18,8 @@
@@ -50,7 +50,7 @@ index c8c1458..0080fd1 100644
  #include "misc/vec/vecPtr.h"
  #include "ioAbc.h"
 diff --git a/src/base/io/ioWriteAiger.c b/src/base/io/ioWriteAiger.c
-index 0a68c7e..d265104 100644
+index cad335d..110256a 100644
 --- a/src/base/io/ioWriteAiger.c
 +++ b/src/base/io/ioWriteAiger.c
 @@ -26,8 +26,8 @@
@@ -64,8 +64,21 @@ index 0a68c7e..d265104 100644
  #include "ioAbc.h"
  
  
+diff --git a/src/map/scl/sclLiberty.c b/src/map/scl/sclLiberty.c
+index 2c3f1b7..e519fbe 100644
+--- a/src/map/scl/sclLiberty.c
++++ b/src/map/scl/sclLiberty.c
+@@ -25,7 +25,7 @@
+ #include <fnmatch.h>
+ #endif
+ 
+-#include "misc/zlib/zlib.h"
++#include <zlib.h>
+ #include "sclLib.h"
+ #include "misc/st/st.h"
+ #include "map/mio/mio.h"
 diff --git a/src/sat/bsat2/MainSat.cpp b/src/sat/bsat2/MainSat.cpp
-index 1f61f9e..ca52356 100644
+index 8554662..d1c2eca 100644
 --- a/src/sat/bsat2/MainSat.cpp
 +++ b/src/sat/bsat2/MainSat.cpp
 @@ -21,7 +21,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
@@ -75,10 +88,10 @@ index 1f61f9e..ca52356 100644
 -#include "misc/zlib/zlib.h"
 +#include <zlib.h>
  
- #include "System.h"
- #include "ParseUtils.h"
+ #include "sat/bsat2/System.h"
+ #include "sat/bsat2/ParseUtils.h"
 diff --git a/src/sat/bsat2/MainSimp.cpp b/src/sat/bsat2/MainSimp.cpp
-index 4a89092..0419bc2 100644
+index 2d0ad10..40ce973 100644
 --- a/src/sat/bsat2/MainSimp.cpp
 +++ b/src/sat/bsat2/MainSimp.cpp
 @@ -21,7 +21,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
@@ -91,7 +104,7 @@ index 4a89092..0419bc2 100644
  #ifndef _WIN32
  #include <sys/resource.h>
 diff --git a/src/sat/bsat2/ParseUtils.h b/src/sat/bsat2/ParseUtils.h
-index 8e0f9c8..d307164 100644
+index b7325f1..8ea8d49 100644
 --- a/src/sat/bsat2/ParseUtils.h
 +++ b/src/sat/bsat2/ParseUtils.h
 @@ -24,7 +24,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
@@ -101,10 +114,10 @@ index 8e0f9c8..d307164 100644
 -#include "misc/zlib/zlib.h"
 +#include <zlib.h>
  
- namespace Minisat {
+ ABC_NAMESPACE_CXX_HEADER_START
  
 diff --git a/src/sat/cnf/cnfMan.c b/src/sat/cnf/cnfMan.c
-index 16a4cf2..bb69e0c 100644
+index cfcc437..96dff25 100644
 --- a/src/sat/cnf/cnfMan.c
 +++ b/src/sat/cnf/cnfMan.c
 @@ -21,7 +21,7 @@

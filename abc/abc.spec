@@ -1,6 +1,6 @@
 %global pkgvers 0
-%global scdate0 20241009
-%global schash0 707442e0915dd7fdbfc5742b04ef16429373075a
+%global scdate0 20260921
+%global schash0 24cec094bcc1401b7d92765ea157ac48bf08fdfe
 %global branch0 master
 %global source0 https://github.com/berkeley-abc/abc.git
 
@@ -37,7 +37,10 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Obsoletes:      yosyshq-abc
 
 %global __cmake_in_source_build 1
-%global _default_patch_fuzz 100
+# Patches are rebased onto the pinned git snapshot and expected to apply exactly;
+# keep fuzz at 0 so any future drift fails loudly instead of applying in the
+# wrong place (the previous fuzz=100 silently misapplied one CMakeLists hunk).
+%global _default_patch_fuzz 0
 
 %description
 ABC is a growing software system for synthesis and verification of
@@ -82,20 +85,24 @@ git log --format=fuller
 %patch -P 1 -p0 -b .shrlib~
 %patch -P 2 -p0 -b .hdr~
 %patch -P 3 -p0 -b .build~
-# % patch -P 4 -p0 -b .name~
+# Patch4 (abc-format.patch) no longer applies to this snapshot and is disabled:
+# patch -P 4 -p0 -b .name~
 %patch -P 100 -p0 -b .gcc11~
 
 # Do not use the bundled libraries
 rm -fr lib src/misc/{bzlib,zlib}
 
 # Set the version number in the man page
-sed 's/@VERSION@/%{version} (%{gitdate})/' %{SOURCE1} > %{name}.1
+sed 's/@VERSION@/%{version} (%{scdate0})/' %{SOURCE1} > %{name}.1
 touch -r %{SOURCE1} %{name}.1
 
 %build
 export CFLAGS="%{optflags} -DNDEBUG -Wno-unused-variable"
 export CXXFLAGS="$CFLAGS"
+# abc's CMakeLists defaults to static libraries (BUILD_SHARED_LIBS=OFF), but this
+# package ships libabc as a shared library with a soname, so ask for it explicitly.
 %cmake . \
+      -DBUILD_SHARED_LIBS=ON \
       -DCMAKE_SKIP_RPATH=YES \
       -DCMAKE_SKIP_INSTALL_RPATH=YES \
       -DCMAKE_VERBOSE_MAKEFILE=OFF \
@@ -143,6 +150,12 @@ install -p -m 0644 %{name}.1 %{buildroot}%{_mandir}/man1
 
 
 %changelog
+* Tue Sep 22 2026 Cristian Balint <cristian.balint@gmail.com> - 1.02
+- Update git pin to current master (24cec094)
+- Rebase the Fedora patches onto the new snapshot and unbundle zlib in
+  src/map/scl/sclLiberty.c (new since the previous pin)
+- Build libabc as a shared library (upstream defaults to static now)
+
 * Sun Jul 25 2021 Cristian Balint <cristian.balint@gmail.com>
 - upstream git relases
 
