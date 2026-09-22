@@ -109,13 +109,19 @@ export CXXFLAGS="$CFLAGS"
       -DCMAKE_BUILD_TYPE=RelWithDebInfo \
       -DABC_SKIP_TESTS=ON
 
-# abc's CMakeLists declares libabc with EXCLUDE_FROM_ALL -- it used to come out
-# anyway as a dependency of the abc binary, but with cmake 4 (fedora-44 and
-# newer) it no longer does and %%install then found no libabc.so.0.0.0.  Ask for
-# both targets explicitly so the shared library the package ships is always
-# built, on every chroot and every cmake generation.  (%% is needed above: rpm
-# expands macros inside comments and a bare %%install aborts the parse.)
-make ABC_MAKE_VERBOSE=0 ABC_USE_STDINT_H=1 %{?_smp_mflags} abc libabc
+# Drive the build through cmake itself rather than the generator's own tool.
+# ABC ships a Makefile in its source root, and Fedora 44's %cmake macro defaults
+# to the Ninja generator, so a bare `make` there picks up ABC's own makefile
+# instead of the generated one and dies with
+#   make: *** No rule to make target 'libabc'.  Stop.
+# (fedora-43, el8 and el9 still default to the Makefile generator, which is why
+# it went unnoticed.)  cmake --build works with either generator, and both
+# targets are named explicitly because libabc is EXCLUDE_FROM_ALL.
+# These two used to be outer `make` variables; exported so ABC's own inner make
+# still sees them whichever generator drives the build (the CMakeLists passes
+# ABC_USE_STDINT_H=1 itself, so this only keeps the previous behaviour).
+export ABC_USE_STDINT_H=1 ABC_MAKE_VERBOSE=0
+cmake --build . %{?_smp_mflags} --target abc libabc
 
 
 %install
