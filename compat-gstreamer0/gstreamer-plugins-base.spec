@@ -51,7 +51,13 @@ BuildRequires:  gcc-c++
 BuildRequires:  make
 
 BuildRequires:  alsa-lib-devel
+# CD paranoia (CD-DA ripping) is EPEL-only: RHEL/CentOS Stream do not ship it,
+# and the centos-stream-9 and rhel-9 chroots have no EPEL, so the dependency --
+# and with it the plug-in, which is the only thing that needs it -- is enabled
+# only where EPEL is.  Same idea as hidapi's mingw gate.
+%if 0%{?epel} || 0%{?fedora}
 BuildRequires:  cdparanoia-devel
+%endif
 BuildRequires:  gtk2-devel
 BuildRequires:  pkgconfig(gudev-1.0)
 BuildRequires:  libogg-devel >= 1.0
@@ -173,7 +179,9 @@ rm -f $RPM_BUILD_ROOT%{_mandir}/man1/gst-visualise*
 
 # base plugins with dependencies
 %{_libdir}/gstreamer-%{majorminor}/libgstalsa.so
+%if 0%{?epel} || 0%{?fedora}
 %{_libdir}/gstreamer-%{majorminor}/libgstcdparanoia.so
+%endif
 %{_libdir}/gstreamer-%{majorminor}/libgstlibvisual.so
 %{_libdir}/gstreamer-%{majorminor}/libgstogg.so
 %{_libdir}/gstreamer-%{majorminor}/libgstpango.so
