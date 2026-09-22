@@ -18,7 +18,13 @@
 #     that name -- and only that name -- is dropped from the list.
 #
 # Everything else is passed through unchanged and in the policy's own order, so
-# update-crypto-policies keeps working and nothing has to be pinned.
+# update-crypto-policies keeps working and nothing has to be pinned.  One thing
+# is added, not audited: the two ML-KEM-768 hybrids this build implements are
+# appended to KexAlgorithms when the policy does not list them, because the el8
+# policies predate ML-KEM and a host upgraded to this build would otherwise keep
+# negotiating classical key exchange only.  Appending hybrid post-quantum key
+# exchange cannot weaken a policy -- it is at least as strong as anything it is
+# tried before -- and it is logged like everything else.
 #
 # Each entry is tried against the daemon itself, on a private throwaway
 # configuration, so the answer is about this binary and the policy entry alone:
@@ -43,9 +49,12 @@ log() {
 
 # A configuration of our own, holding nothing but a throwaway host key, so that
 # probing does not depend on /etc/ssh at all.
-probe_dir=$(mktemp -d) || exit 0
+probe_dir=$(mktemp -d) || { log "cannot create a probe directory, policy not applied"; exit 0; }
 trap 'rm -rf "$probe_dir"' EXIT
-ssh-keygen -q -t ed25519 -N '' -f "$probe_dir/hostkey" >/dev/null 2>&1 || exit 0
+if ! ssh-keygen -q -t ed25519 -N '' -f "$probe_dir/hostkey" >/dev/null 2>&1; then
+    log "cannot create a probe host key, policy not applied"
+    exit 0
+fi
 printf 'HostKey %s\n' "$probe_dir/hostkey" >"$probe_dir/sshd_config"
 
 probe="$SSHD -T -f $probe_dir/sshd_config"
@@ -123,6 +132,17 @@ for word in $policy; do
             fi
         done
         value=${kept#,}
+        if [ "$name" = KexAlgorithms ]; then
+            for pq in mlkem768x25519-sha256 mlkem768nistp256-sha256; do
+                case ",$value," in
+                *",$pq,"*) continue ;;
+                esac
+                if takes_algorithm KexAlgorithms "$pq"; then
+                    value="$pq${value:+,$value}"
+                    log "adding $pq to KexAlgorithms: the policy predates ML-KEM and this sshd implements it"
+                fi
+            done
+        fi
         if [ -n "$dropped" ]; then
             log "dropping$dropped from $name: not implemented by this sshd"
         fi

@@ -43,7 +43,7 @@
 
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        An open source implementation of SSH protocol version 2
 
 License:        BSD-3-Clause AND BSD-2-Clause AND ISC AND SSH-OpenSSH AND ssh-keyscan AND snprintf
@@ -241,6 +241,14 @@ done
 # issued between the install and the next reload would otherwise use the cached
 # ExecStart and hand sshd the unfiltered policy.
 systemctl daemon-reload >/dev/null 2>&1 || :
+# Say so if the configuration on this host cannot be parsed by this build,
+# rather than leaving the daemon unable to start after the next reboot.
+# Upstream 10.5 has dropped a few long-deprecated directives, and a
+# hand-edited sshd_config can still carry them.
+if ! %{_sbindir}/sshd -t >/dev/null 2>&1; then
+    echo "warning: %{_sysconfdir}/ssh/sshd_config is not accepted by this sshd:" >&2
+    %{_sbindir}/sshd -t 2>&1 | sed 's/^/warning: /' >&2
+fi
 
 %preun server
 %systemd_preun sshd.service sshd.socket
@@ -309,6 +317,24 @@ systemctl daemon-reload >/dev/null 2>&1 || :
 %{_mandir}/man8/sftp-server.8*
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-10
+- Enable post-quantum key exchange for real.  This build implements the ML-KEM-768
+  hybrids (kexmlkem768x25519.c, kexmlkem768ecdh.c) and upstream enables
+  mlkem768x25519-sha256 by default in ssh_config, but the el8 crypto policies
+  predate ML-KEM, so the server kept negotiating classical key exchange only and
+  a client complained "connection is not using a post-quantum key exchange
+  algorithm".  crypto-policy-args now appends the two hybrids this binary has to
+  KexAlgorithms -- appended in front of the policy's own list, never replacing it,
+  so no policy can be weakened by it -- and logs doing so.  Verified with the el8
+  stock policy: KexAlgorithms becomes
+  "mlkem768nistp256-sha256,mlkem768x25519-sha256,curve25519-sha256,...".
+- Have %%post parse the host's sshd_config with this build and print a warning if
+  it is rejected.  Upstream 10.5 dropped some long-deprecated directives, so a
+  hand-edited file is the one thing this package cannot make safe by itself; now
+  the admin learns about it at install time instead of at the next reboot.
+- crypto-policy-args also says so in the journal if it cannot create its throwaway
+  probe (in which case no policy is applied, rather than a wrong one).
+
 * Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-9
 - Cover the socket-activated unit as well: sshd@.service runs sshd -i per
   connection and is not affected by a drop-in for sshd.service, so enabling
