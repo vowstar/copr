@@ -1,10 +1,10 @@
 Name:       sarasa-gothic-fonts
-Version:    1.0.31
+Version:    1.0.41
 Release:    1%{?dist}
 Summary:    a CJK composite font
 License:    OFL-1.1
 URL:        https://github.com/be5invis/Sarasa-Gothic
-Source0:    https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.31/Sarasa-TTC-1.0.31.zip
+Source0:    https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.41/Sarasa-TTC-1.0.41.zip
 BuildArch:  noarch
 
 %description
