@@ -1,6 +1,6 @@
 %global pkgvers 0
-%global scdate0 20241009
-%global schash0 30c3d077f281876286a7aa37afbd411d4bd1667e
+%global scdate0 20260922
+%global schash0 8136bc6cea27ee698f4ce3b932b440208d774b82
 %global branch0 master
 %global source0 https://github.com/openocd-org/openocd.git
 
@@ -138,7 +138,7 @@ chrpath --delete %{buildroot}/%{_bindir}/openocd
 
 %files
 %license COPYING
-%doc AUTHORS ChangeLog NEWS* NEWTAPS README TODO
+%doc AUTHORS ChangeLog NEWS* NEWTAPS README.md TODO
 %{_datadir}/%{name}/angie
 %{_datadir}/%{name}/scripts
 %{_datadir}/%{name}/OpenULINK/ulink_firmware.hex
@@ -149,6 +149,9 @@ chrpath --delete %{buildroot}/%{_bindir}/openocd
 %{_mandir}/man1/*
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 0.12.0-20260922.0.git8136bc6c
+- Update to master commit 8136bc6c (2026-09-22)
+
 * Tue Aug 17 2021 Cristian Balint <cristian.balint@gmail.com>
 - update to git releases
 
