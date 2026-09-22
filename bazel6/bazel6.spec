@@ -19,6 +19,13 @@ Conflicts:      bazel
 Conflicts:      bazel4
 Conflicts:      bazel5
 
+# Bazel 6.x builds its own bootstrap with JDK 11 (compile.sh JAVA_VERSION:=11,
+# .bazelrc --java_language_version=11 / --java_runtime_version=remotejdk_11), so
+# both the build and the shipped /usr/bin/bazel-real need java-11-openjdk-devel.
+# Fedora 43 and newer no longer ship JDK 11, which is why the fedora-* COPR
+# chroots fail with "No match for argument: java-11-openjdk-devel" (reproduced
+# with dnf builddep on fedora:43); this package's COPR chroots are therefore the
+# eight EL chroots, where JDK 11 is available.
 BuildRequires:  java-11-openjdk-devel
 #BuildRequires:  java-1_8_0-openjdk-headless ## OpenSUSE
 #BuildRequires:  java-1.8.0-openjdk-headless ## Mageia
