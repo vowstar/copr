@@ -2,14 +2,21 @@
 %global oname find_libpython
 %global debug_package %{nil}
 Name:           python3-%{pypi_name}
-Version:        0.4.0
+Version:        0.5.1
 Release:        1%{?dist}
 Summary:        Finds the libpython associated with the current environment
 License:        MIT
 URL:            https://github.com/ktbarrett/find_libpython
 Source0:        https://github.com/ktbarrett/find_libpython/archive/v%{version}.tar.gz
 
-BuildRequires:  git gcc-c++ make python3-devel python3-setuptools
+BuildRequires:  python3-devel
+BuildRequires:  pyproject-rpm-macros
+# 0.5.1 is a PEP 621 project and needs setuptools >= 61.2 to build, but the el9
+# repositories only ship setuptools 53 for the default python3.9, so no el9
+# chroot can satisfy python3dist(setuptools) >= 61.2.  Build the wheel in an
+# isolated environment instead and let it fetch its own backend (the COPR
+# project has networking enabled).
+BuildRequires:  python3-pip
 
 BuildArch:      noarch
 
@@ -41,16 +48,25 @@ Provides:       %{pypi_name}
 %prep
 %autosetup -n %{oname}-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires -N
+
 %build
-%py3_build
+%{python3} -m pip wheel --no-deps --wheel-dir %{_pyproject_wheeldir} .
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{oname}
 
-%files -n python3-%{pypi_name}
+%files -n python3-%{pypi_name} -f %{pyproject_files}
 %license LICENSE
 %doc README.md
 %{_bindir}/*
-%{python3_sitelib}/*
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 0.5.1-1
+- Update to 0.5.1
+- Convert from setup.py to pyproject-rpm-macros
+- Build the wheel in an isolated environment: el9 only ships setuptools
+  53 for python3.9, which cannot build a PEP 621 project, and upstream
+  0.5.1 requires setuptools >= 61.2
