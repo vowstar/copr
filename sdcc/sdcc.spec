@@ -47,6 +47,15 @@ if you want to modify the C library or as reference of how it works.
 # comments, so on Fedora (rpm 6) it ran a second extraction and then failed with
 # "cd: sdcc: No such file or directory", killing %%prep in every fedora-* chroot
 # while el8/el9 (rpm 4.14/4.16) kept building.  Do not re-add it.
+#
+# %%build on Fedora still fails for a different, upstream reason: GCC 15 (C23 by
+# default) rejects this 2022 source, e.g.
+#   sdcdb.h:63:15: error: both 'short' and '_Bool' in declaration specifiers
+#   lkelf.c:857:1: error: conflicting types for 'elf'; have 'void(int)'
+# so the five fedora-* chroots cannot build 4.2.0 either -- they are left in
+# place but stay red; el8/el9 build and are what this package is for.
+# (4.6.0 fixes the GCC 15 build but needs boost >= 1.79, which EL8/EL9 do not
+# have -- el8 ships 1.66, el9 1.75 -- so the EL chroots stay on 4.2.0.)
 find -name '*.{c,h,cc}' -a -perm -a=x -exec chmod -a=x '{}' \;
 %patch -P 1 -p1
 # Disable brp-strip-static-archive for now because it errors trying to
