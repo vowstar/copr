@@ -21,6 +21,13 @@ Patch0:         gstreamer-0.10.36-bison3.patch
 
 Requires:       gstreamer-tools >= %{version}
 
+# The RPM name follows Red Hat's own scheme for the two GStreamer generations
+# (0.10 keeps the plain name, 1.x is gstreamer1 -- verified against the
+# CentOS 7 vault).  This alias exists only because this repository keeps the
+# 0.10 stack in the compat-gstreamer0/ directory, so that a search or a
+# "dnf install compat-gstreamer0" finds it under that name too.
+Provides:       compat-gstreamer0 = %{version}-%{release}
+
 BuildRequires:  glib2-devel >= %{_glib2}
 BuildRequires:  libxml2-devel >= %{_libxml2}
 BuildRequires:  bison
