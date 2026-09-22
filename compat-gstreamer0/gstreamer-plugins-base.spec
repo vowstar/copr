@@ -34,7 +34,7 @@ Summary:        GStreamer streaming media framework base plug-ins
 
 License:        LGPLv2+
 URL:            http://gstreamer.freedesktop.org/
-#Source:         http://gstreamer.freedesktop.org/src/gst-plugins-base/pre/gst-plugins-base-%{version}.tar.bz2
+#Source:         http://gstreamer.freedesktop.org/src/gst-plugins-base/pre/gst-plugins-base-%%{version}.tar.bz2
 Source:         https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-%{version}.tar.xz
 # https://bugzilla.gnome.org/show_bug.cgi?id=652342 - fixes RB CD rip
 
@@ -86,8 +86,8 @@ This package contains a set of well-maintained base plug-ins.
 
 %prep
 %setup -q -n gst-plugins-base-%{version}
-%patch0 -p1 -b .mpegaudioversion
-%patch1 -p1 -b .enumtypes
+%patch -P 0 -p1 -b .mpegaudioversion
+%patch -P 1 -p1 -b .enumtypes
 
 %build
 %configure \
@@ -353,7 +353,7 @@ library.
 %doc %{_datadir}/gtk-doc/html/gst-plugins-base-plugins-%{majorminor}
 
 %changelog
-* Mon Sep 22 2026 vowstar <vowstar@gmail.com> - 0.10.36-25
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 0.10.36-25
 - Port the RHEL7 packaging to el8/el9 (see the header comment for the exact
   differences) so the 0.10 base plug-ins are available next to the gstreamer
   0.10.36 package in this repository.
