@@ -17,7 +17,7 @@
 #
 # Build-time Python: verilator's astgen uses the walrus operator, so the build
 # needs python3 >= 3.8, and its test driver (test_regress/driver.py) uses
-# structural pattern matching, so %check needs python3 >= 3.10.  ice2 has
+# structural pattern matching, so the check phase needs python3 >= 3.10.  ice2 has
 # /usr/bin/python3.12; ucun1 has only 3.6 and no network, so it uses the private
 # interpreter in ~/opt/python3.11 -- put it on PATH when invoking rpmbuild there:
 #   PATH=$HOME/opt/python3.11/bin:$PATH rpmbuild -bb SPECS/verilator.spec
@@ -46,12 +46,12 @@
 %global with_docs 0
 
 # Verilator's build scripts (astgen) need Python >= 3.8; the distro python3 is
-# 3.6 on both el7 and el8.  Pick the newest python3.x in %{_bindir}; the default
+# 3.6 on both el7 and el8.  Pick the newest python3.x in /usr/bin; the default
 # is plain python3 (correct on COPR/Fedora, and on ucun1 via the private
 # /home/vowstar/opt/python3.11 -- override the macro explicitly when building
 # there:  rpmbuild -bb --define 'buildpy /home/vowstar/opt/python3.11/bin/python3' SPECS/verilator.spec
 # No nested command substitution here on purpose: COPR builds SRPMs with rpkg,
-# whose spec parser trips over $( ) nested inside %( ).
+# whose spec parser trips over a nested shell substitution inside an rpm shell macro.
 %global buildpy %(p=%{_bindir}/python3; for v in 3.13 3.12 3.11 3.10 3.9 3.8; do if [ -x %{_bindir}/python$v ]; then p=%{_bindir}/python$v; break; fi; done; echo $p)
 
 Name:           verilator
@@ -63,9 +63,8 @@ URL:            https://verilator.org
 Source0:        https://github.com/verilator/verilator/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Build-time only: verilator's test driver (test_regress/driver.py) imports
 # `distro`, which is packaged for py3.6 only on el7/el8 -- not for the newer
-# python3.x the test suite itself needs.  Vendored for %check.
+# python3.x the test suite itself needs.  Vendored for the check phase.
 Source1:        https://files.pythonhosted.org/packages/fc/f8/98eea607f65de6527f8a2e8885fc8015d3e6f5775df186e443e0964a11c3/distro-1.9.0.tar.gz
-BuildArch:      x86_64
 
 %if 0%{?rhel} == 7
 BuildRequires:  devtoolset-11-gcc-c++
@@ -82,11 +81,11 @@ BuildRequires:  bison
 BuildRequires:  help2man
 %if 0%{?rhel} == 8 || 0%{?rhel} == 9
 # The platform python3 is 3.6 on el8 and 3.9 on el9, while src/astgen needs
-# >= 3.8 (walrus operator) and %check's test_regress/driver.py needs >= 3.10
+# >= 3.8 (walrus operator) and the test driver test_regress/driver.py needs >= 3.10
 # (structural pattern matching at driver.py:2626).  python3.11 is a plain
 # (non-modular) AppStream package on both el8 and el9, so this resolves in a
-# clean chroot; it is also what the macro above picks as %{buildpy}.  Without it
-# the el9/centos-stream-9 builds die in %check with "verilator's test driver
+# clean chroot; it is also what the macro above picks as the interpreter.  Without it
+# the el9/centos-stream-9 builds die in the check phase with "verilator's test driver
 # needs python3 >= 3.10" (the 5.027 spec COPR built before did not hit this:
 # that driver.py had no match statement yet).
 BuildRequires:  python3.11
@@ -150,8 +149,8 @@ MAKEFLAGS=
 %endif
 # verilator's smoke tests are run through their own shebang
 # (#!/usr/bin/env python3), so python3 on PATH must be good enough too, not just
-# %{buildpy} (el8's /usr/bin/python3 is the 3.6 platform python).  PYTHON3 itself
-# goes on the make command line for the same reason as in %build.
+# the chosen interpreter (el8's /usr/bin/python3 is the 3.6 platform python).  PYTHON3
+# goes on the make command line for the same reason as in the build phase.
 mkdir -p %{_builddir}/pypath
 ln -sf %{buildpy} %{_builddir}/pypath/python3
 %{__tar} xf %{SOURCE1} -C %{_builddir}
