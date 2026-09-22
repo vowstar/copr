@@ -2,8 +2,12 @@ Name:           hidapi
 Version:        0.15.0
 Release:        1%{?dist}
 # The mingw cross subpackages need a Fedora/EL9-era mingw-filesystem
-# (EL8 ships 104: no %mingw_make_build, and %mingw32_pkg_name does not
-# prefix a non-"mingw-" package name). Build them only where they work.
+# (EL8 ships 104: it has no %%mingw_make_build, and %%mingw32_pkg_name does
+# not prefix a non-"mingw-" package name).  Build them only where they work.
+# NB: the %% above must stay escaped -- once mingw-filesystem is installed,
+# rpm expands macros even inside comments, and an unescaped %%mingw_make_build
+# expands to a multi-line shell function that rpm then rejects as an
+# "Unknown tag" (seen as an epel-9 build failure).
 %global with_mingw 1
 %if 0%{?rhel} && 0%{?rhel} < 9
 %global with_mingw 0
