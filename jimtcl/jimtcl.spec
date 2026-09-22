@@ -1,13 +1,13 @@
 %global pkgvers 0
-%global scdate0 20240920
-%global schash0 1273201def190161c3e39fbe42bbfea4d642d8a3
+%global scdate0 20260716
+%global schash0 d5243a25c488dfe751ef218828f13516e04ea2ba
 %global branch0 master
 %global source0 https://github.com/msteveb/jimtcl.git
 
 %global sshort0 %{expand:%%{lua:print(('%{schash0}'):sub(1,8))}}
 
 Name:           jimtcl
-Version:        0.83
+Version:        0.84
 Release:        %{scdate0}.%{pkgvers}.git%{sshort0}%{?dist}
 Summary:        A small embeddable Tcl interpreter
 License:        BSD
@@ -86,5 +86,8 @@ rm %{buildroot}/%{_libdir}/jim/README.extensions
 %{_libdir}/pkgconfig/jimtcl.pc
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 0.84-20260716.0.gitd5243a25
+- Update to upstream 0.84 (git commit d5243a25)
+
 * Tue Aug 17 2021 Cristian Balint <cristian.balint@gmail.com>
 - github update releases
