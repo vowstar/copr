@@ -3,7 +3,7 @@
 %define _disable_source_fetch 0
 
 Name:           bazel6
-Version:        6.1.1
+Version:        6.6.0
 Release:        1%{?dist}
 Summary:        Correct, reproducible, and fast builds for everyone.
 License:        Apache License 2.0
@@ -13,7 +13,6 @@ Source0:        https://github.com/bazelbuild/bazel/releases/download/%{version}
 # FIXME: Java 11 log.warning generates backtrace
 Patch1:         bazel-1.0.0-log-warning.patch
 Patch2:         bazel-gcc.patch
-Patch3:         bazel-abseil.patch
 
 # for folks with 'bazel' v1 package installed
 Conflicts:      bazel
@@ -24,7 +23,7 @@ BuildRequires:  java-11-openjdk-devel
 #BuildRequires:  java-1_8_0-openjdk-headless ## OpenSUSE
 #BuildRequires:  java-1.8.0-openjdk-headless ## Mageia
 BuildRequires:  zlib-devel
-BuildRequires:  pkgconfig(bash-completion)
+BuildRequires:  bash-completion
 BuildRequires:  findutils
 BuildRequires:  which
 BuildRequires:  unzip
@@ -49,7 +48,7 @@ BuildRequires:  gcc-c++
 BuildRequires:  clang
 %endif
 
-%define bashcompdir %(pkg-config --variable=completionsdir bash-completion 2>/dev/null)
+%define bashcompdir %{_datadir}/bash-completion/completions
 %global debug_package %{nil}
 %define __os_install_post %{nil}
 
@@ -60,7 +59,6 @@ Correct, reproducible, and fast builds for everyone.
 %setup -q -c -n bazel-%{version}
 %patch -P 1 -p0 -b .log~
 %patch -P 2 -p0 -b .gcc~
-%patch -P 3 -p0 -b .abseil~
 
 
 %build
@@ -102,7 +100,7 @@ export TEST_TMPDIR=%{_tmppath}
 export CC=gcc
 export CXX=g++
 export EXTRA_BAZEL_ARGS="${EXTRA_BAZEL_ARGS} --sandbox_debug --host_javabase=@local_jdk//:jdk --verbose_failures --subcommands --explain=build.log --show_result=2147483647"
-%if (0%{?fedora} == 35) || (0%{?rhel} == 9)
+%if 0%{?rhel} == 9
 export CXXFLAGS="-include /usr/include/c++/11/limits"
 export EXTRA_BAZEL_ARGS="${EXTRA_BAZEL_ARGS} --cxxopt=-include/usr/include/c++/11/limits"
 %endif
