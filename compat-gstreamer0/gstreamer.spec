@@ -117,10 +117,10 @@ This package contains wrapper scripts for the command-line tools that work
 with different major/minor versions of GStreamer.
 
 %prep
-%setup -q
-%patch0 -p1 -b .bison3
-%patch1 -p1 -b .rpm-provides
-%patch2 -p1 -b .fix-docs
+# autosetup instead of the obsolete numbered patch macros, which modern rpm
+# (the one COPR uses to generate the SRPM) rejects outright.  All three patches
+# apply with strip level 1, so autosetup can apply them all.
+%autosetup -p1
 
 %build
 %configure \
