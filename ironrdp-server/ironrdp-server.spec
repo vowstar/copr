@@ -20,6 +20,21 @@
 # real RDP session (HYBRID_EX/CredSSP + TLS) with the upstream IronRDP client,
 # and the policy module compiles against selinux-policy-devel for both the
 # targeted and mls variants.
+#
+# COPR chroots: the eight EL ones (el8/el9 families, rhel-8/9, epel-8/9), set via
+#   copr-cli build-package -r epel-8-x86_64 -r rhel-8-x86_64 \
+#     -r centos-stream-8-x86_64 -r centos-stream+epel-next-8-x86_64 \
+#     -r epel-9-x86_64 -r rhel-9-x86_64 -r centos-stream-9-x86_64 \
+#     -r centos-stream+epel-next-9-x86_64 --name ironrdp-server vowstar/eda
+# The Fedora chroots cannot build it: rustls' default crypto provider aws-lc-sys
+# (0.42.0, pinned by the crate's own Cargo.lock) compiles a feature-probe binary
+# that Fedora's PIE/hardened-ld defaults refuse to link
+#   /usr/bin/ld: relocation R_X86_64_32 against `.rodata' ...
+#   /usr/bin/ld: failed to set dynamic section sizes: bad value
+#   Failed to compile memcmp_invalid_stripped_check
+# and its build script aborts instead of falling back.  Working around it would
+# mean dropping the linker hardening for the whole package, so this package
+# stays on the EL chroots, which is also where it is meant to be used.
 
 %global crate          ironrdp
 %global crate_ver      0.17.0
