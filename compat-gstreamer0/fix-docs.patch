@@ -1,0 +1,84 @@
+diff -ru gstreamer-0.10.36/docs/gst/Makefile.in gstreamer-0.10.36.new/docs/gst/Makefile.in
+--- gstreamer-0.10.36/docs/gst/Makefile.in	2012-02-20 23:48:21.000000000 +0100
++++ gstreamer-0.10.36.new/docs/gst/Makefile.in	2016-12-19 14:59:35.661677389 +0100
+@@ -839,10 +839,7 @@
+ @ENABLE_GTK_DOC_TRUE@	if test "$(?)" = "0"; then \
+ @ENABLE_GTK_DOC_TRUE@	  mkhtml_options=--path="$(abs_srcdir)"; \
+ @ENABLE_GTK_DOC_TRUE@	fi; \
+-@ENABLE_GTK_DOC_TRUE@	cd html && gtkdoc-mkhtml $$mkhtml_options $(MKHTML_OPTIONS) $(DOC_MODULE) ../$(DOC_MAIN_SGML_FILE)
+-@ENABLE_GTK_DOC_TRUE@	@mv html/index.sgml html/index.sgml.bak
+-@ENABLE_GTK_DOC_TRUE@	@$(SED) "s/ href=\"$(DOC_MODULE)\// href=\"$(DOC_MODULE)-@GST_MAJORMINOR@\//g" html/index.sgml.bak >html/index.sgml
+-@ENABLE_GTK_DOC_TRUE@	@rm -f html/index.sgml.bak
++@ENABLE_GTK_DOC_TRUE@	cd html && gtkdoc-mkhtml $$mkhtml_options $(MKHTML_OPTIONS) $(DOC_MODULE)-@GST_MAJORMINOR@ ../$(DOC_MAIN_SGML_FILE)
+ @ENABLE_GTK_DOC_TRUE@	@rm -rf html/xml
+ @ENABLE_GTK_DOC_TRUE@	@rm -f version.entities
+ @ENABLE_GTK_DOC_TRUE@	@test "x$(HTML_IMAGES)" = "x" ||  ( cd $(srcdir) && cp $(HTML_IMAGES) $(abs_builddir)/html )
+@@ -896,9 +893,9 @@
+ 	    echo '-- Installing '$$i ; \
+ 	    $(INSTALL_DATA) $$i $(DESTDIR)$(TARGET_DIR); \
+ 	  done; \
+-	  echo '-- Installing $(builddir)/html/$(DOC_MODULE).devhelp2' ; \
+-	  if test -e $(builddir)/html/$(DOC_MODULE).devhelp2; then \
+-	            $(INSTALL_DATA) $(builddir)/html/$(DOC_MODULE).devhelp2 \
++	  echo '-- Installing $(builddir)/html/$(DOC_MODULE)-@GST_MAJORMINOR@.devhelp2' ; \
++	  if test -e $(builddir)/html/$(DOC_MODULE)-@GST_MAJORMINOR@.devhelp2; then \
++	            $(INSTALL_DATA) $(builddir)/html/$(DOC_MODULE)-@GST_MAJORMINOR@.devhelp2 \
+ 	            $(DESTDIR)$(TARGET_DIR)/$(DOC_MODULE)-@GST_MAJORMINOR@.devhelp2; \
+ 	  fi; \
+ 	  (which gtkdoc-rebase >/dev/null && \
+diff -ru gstreamer-0.10.36/docs/libs/Makefile.in gstreamer-0.10.36.new/docs/libs/Makefile.in
+--- gstreamer-0.10.36/docs/libs/Makefile.in	2012-02-20 23:48:21.000000000 +0100
++++ gstreamer-0.10.36.new/docs/libs/Makefile.in	2016-12-19 15:00:14.837745929 +0100
+@@ -828,10 +828,7 @@
+ @ENABLE_GTK_DOC_TRUE@	if test "$(?)" = "0"; then \
+ @ENABLE_GTK_DOC_TRUE@	  mkhtml_options=--path="$(abs_srcdir)"; \
+ @ENABLE_GTK_DOC_TRUE@	fi; \
+-@ENABLE_GTK_DOC_TRUE@	cd html && gtkdoc-mkhtml $$mkhtml_options $(MKHTML_OPTIONS) $(DOC_MODULE) ../$(DOC_MAIN_SGML_FILE)
+-@ENABLE_GTK_DOC_TRUE@	@mv html/index.sgml html/index.sgml.bak
+-@ENABLE_GTK_DOC_TRUE@	@$(SED) "s/ href=\"$(DOC_MODULE)\// href=\"$(DOC_MODULE)-@GST_MAJORMINOR@\//g" html/index.sgml.bak >html/index.sgml
+-@ENABLE_GTK_DOC_TRUE@	@rm -f html/index.sgml.bak
++@ENABLE_GTK_DOC_TRUE@	cd html && gtkdoc-mkhtml $$mkhtml_options $(MKHTML_OPTIONS) $(DOC_MODULE)-@GST_MAJORMINOR@ ../$(DOC_MAIN_SGML_FILE)
+ @ENABLE_GTK_DOC_TRUE@	@rm -rf html/xml
+ @ENABLE_GTK_DOC_TRUE@	@rm -f version.entities
+ @ENABLE_GTK_DOC_TRUE@	@test "x$(HTML_IMAGES)" = "x" ||  ( cd $(srcdir) && cp $(HTML_IMAGES) $(abs_builddir)/html )
+@@ -885,9 +882,9 @@
+ 	    echo '-- Installing '$$i ; \
+ 	    $(INSTALL_DATA) $$i $(DESTDIR)$(TARGET_DIR); \
+ 	  done; \
+-	  echo '-- Installing $(builddir)/html/$(DOC_MODULE).devhelp2' ; \
+-	  if test -e $(builddir)/html/$(DOC_MODULE).devhelp2; then \
+-	            $(INSTALL_DATA) $(builddir)/html/$(DOC_MODULE).devhelp2 \
++	  echo '-- Installing $(builddir)/html/$(DOC_MODULE)-@GST_MAJORMINOR@.devhelp2' ; \
++	  if test -e $(builddir)/html/$(DOC_MODULE)-@GST_MAJORMINOR@.devhelp2; then \
++	            $(INSTALL_DATA) $(builddir)/html/$(DOC_MODULE)-@GST_MAJORMINOR@.devhelp2 \
+ 	            $(DESTDIR)$(TARGET_DIR)/$(DOC_MODULE)-@GST_MAJORMINOR@.devhelp2; \
+ 	  fi; \
+ 	  (which gtkdoc-rebase >/dev/null && \
+diff -ru gstreamer-0.10.36/docs/plugins/Makefile.in gstreamer-0.10.36.new/docs/plugins/Makefile.in
+--- gstreamer-0.10.36/docs/plugins/Makefile.in	2012-02-20 23:48:22.000000000 +0100
++++ gstreamer-0.10.36.new/docs/plugins/Makefile.in	2016-12-19 15:01:07.876484878 +0100
+@@ -944,10 +944,7 @@
+ @ENABLE_GTK_DOC_TRUE@	    mkhtml_options="$$mkhtml_options --verbose"; \
+ @ENABLE_GTK_DOC_TRUE@	  fi; \
+ @ENABLE_GTK_DOC_TRUE@	fi; \
+-@ENABLE_GTK_DOC_TRUE@	cd html && gtkdoc-mkhtml $$mkhtml_options $(DOC_MODULE) $(DOC_MAIN_SGML_FILE)
+-@ENABLE_GTK_DOC_TRUE@	@mv html/index.sgml html/index.sgml.bak
+-@ENABLE_GTK_DOC_TRUE@	@$(SED) "s/ href=\"$(DOC_MODULE)\// href=\"$(DOC_MODULE)-@GST_MAJORMINOR@\//g" html/index.sgml.bak >html/index.sgml
+-@ENABLE_GTK_DOC_TRUE@	@rm -f html/index.sgml.bak
++@ENABLE_GTK_DOC_TRUE@	cd html && gtkdoc-mkhtml $$mkhtml_options $(DOC_MODULE)-@GST_MAJORMINOR@ $(DOC_MAIN_SGML_FILE)
+ @ENABLE_GTK_DOC_TRUE@	@rm -f html/$(DOC_MAIN_SGML_FILE)
+ @ENABLE_GTK_DOC_TRUE@	@rm -rf html/xml
+ @ENABLE_GTK_DOC_TRUE@	@rm -f html/version.entities
+@@ -1007,9 +1004,9 @@
+ 	      $(INSTALL_DATA) $$i $(DESTDIR)$(TARGET_DIR); \
+ 	    done; \
+ 	  fi; \
+-	  echo '-- Installing $(builddir)/html/$(DOC_MODULE).devhelp2' ; \
+-	  if test -e $(builddir)/html/$(DOC_MODULE).devhelp2; then \
+-	            $(INSTALL_DATA) $(builddir)/html/$(DOC_MODULE).devhelp2 \
++	  echo '-- Installing $(builddir)/html/$(DOC_MODULE)-@GST_MAJORMINOR@.devhelp2' ; \
++	  if test -e $(builddir)/html/$(DOC_MODULE)-@GST_MAJORMINOR@.devhelp2; then \
++	            $(INSTALL_DATA) $(builddir)/html/$(DOC_MODULE)-@GST_MAJORMINOR@.devhelp2 \
+ 	            $(DESTDIR)$(TARGET_DIR)/$(DOC_MODULE)-@GST_MAJORMINOR@.devhelp2; \
+ 	  fi; \
+ 	  (which gtkdoc-rebase >/dev/null && \
