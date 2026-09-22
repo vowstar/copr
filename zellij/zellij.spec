@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:       zellij
-Version:    0.41.2
+Version:    0.45.1
 Release:    1%{?dist}
 Summary:    A terminal workspace with batteries included.
 
@@ -21,6 +21,7 @@ BuildRequires:  perl-interpreter
 BuildRequires:  perl-FindBin
 %endif
 BuildRequires: perl-IPC-Cmd
+BuildRequires: perl-Time-Piece
 
 %description
 Zellij is a workspace aimed at developers, ops-oriented people and anyone who loves the terminal. At its core, it is a terminal multiplexer (similar to tmux and screen), but this is merely its infrastructure layer. Zellij includes a layout system, and a plugin system allowing one to create plugins in any language that compiles to WebAssembly.
@@ -34,8 +35,7 @@ curl https://sh.rustup.rs -sSf | sh -s -- --profile minimal --default-toolchain 
 %install
 export CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_OPT_LEVEL=3
 export PATH="$HOME/.cargo/bin:$PATH"
-$HOME/.cargo/bin/rustup default 1.75.0
-sed -i '/^\[dependencies\]/a home = "=0.5.9"' Cargo.toml
+$HOME/.cargo/bin/rustup default 1.95.0
 $HOME/.cargo/bin/cargo install --root=%{buildroot}%{_prefix} --path=.
 
 rm -f %{buildroot}%{_prefix}/.crates.toml \
