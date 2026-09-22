@@ -14,10 +14,20 @@
 # the stock packages cleanly.  Those files are shipped as Sources below and are
 # unmodified except where noted.
 #
-# Built without --with-security-key-builtin: that needs libfido2-devel, which
-# el8 only has in EPEL, and the rhel-8/centos-stream-8 chroots would then fail to
-# resolve build dependencies.  Add "BuildRequires: libfido2-devel" back together
-# with the flag if you build on a host that has EPEL and want sk-* security keys.
+# Feature set: everything RHEL 9 enables that is worth having here -- PAM,
+# SELinux, audit, systemd, GSSAPI/Kerberos (--with-kerberos5), FIDO/U2F security
+# keys (--with-security-key-builtin), libedit for interactive history,
+# PKCS#11/engine support, IPv4-first, a vendor patchlevel string.  The two RHEL
+# options deliberately left out are --with-rsh (rsh/rlogin clients, obsolete) and
+# --enable-dsa-keys (upstream removed DSA in 10.0 and it is weak anyway).
+#
+# GSSAPI is not optional in practice: without it sshd rejects the
+# -oGSSAPIKexAlgorithms=... option that RHEL 8/9 crypto-policies put on its
+# command line (an unknown -o option is fatal, unlike one in sshd_config) and the
+# service never starts.  FIDO likewise must match the policy: the current
+# crypto-policies list sk-ecdsa-sha2-nistp256@openssh.com and
+# sk-ssh-ed25519@openssh.com among the accepted host key / pubkey / CA
+# signature algorithms.
 #
 # Build (as vowstar, from ~/rpmbuild):  rpmbuild -bb SPECS/openssh.spec
 # Install (as root):                    dnf upgrade RPMS/x86_64/openssh-*.rpm
@@ -26,7 +36,7 @@
 
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        An open source implementation of SSH protocol version 2
 
 License:        BSD-3-Clause AND BSD-2-Clause AND ISC AND SSH-OpenSSH AND ssh-keyscan AND snprintf
@@ -50,6 +60,10 @@ BuildRequires:  groff
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
 BuildRequires:  pam-devel
+BuildRequires:  libfido2-devel
+BuildRequires:  libedit-devel
+BuildRequires:  ncurses-devel
+BuildRequires:  p11-kit-devel
 # GSSAPI (Kerberos 5) support.  Not optional on el8/el9 in practice: the
 # distribution's crypto-policies feed sshd a command line of -o options
 # (/etc/crypto-policies/back-ends/opensshserver.config, expanded by the unit
@@ -120,6 +134,12 @@ default configuration and the helper that generates the host keys.
     --with-sandbox=seccomp_filter \
     --with-pam \
     --with-kerberos5 \
+    --with-security-key-builtin=yes \
+    --with-libedit \
+    --with-default-pkcs11-provider=yes \
+    --with-ssl-engine \
+    --with-ipv4-default \
+    --enable-vendor-patchlevel=eda \
     --with-selinux \
     --with-audit=linux \
     --with-pie=no \
@@ -238,6 +258,15 @@ exit 0
 %{_mandir}/man8/sftp-server.8*
 
 %changelog
+* Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-3
+- Enable the rest of the feature set RHEL 9 builds: FIDO/U2F security keys
+  (--with-security-key-builtin, libfido2-devel), libedit, PKCS#11
+  (--with-default-pkcs11-provider, --with-ssl-engine), IPv4-first and a vendor
+  patchlevel string; add the xauth runtime requirement for X11 forwarding.
+  crypto-policies lists sk-ecdsa-sha2-nistp256@openssh.com and
+  sk-ssh-ed25519@openssh.com among the accepted algorithms, so a build without
+  FIDO cannot accept the distribution's own policy.
+
 * Tue Sep 22 2026 vowstar <vowstar@gmail.com> - 10.5p1-2
 - Build with krb5-devel and --with-kerberos5.  Without GSSAPI the daemon does
   not understand the -oGSSAPIKexAlgorithms=... option that the RHEL 8/9 crypto
