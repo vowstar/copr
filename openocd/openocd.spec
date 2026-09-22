@@ -14,6 +14,12 @@ License:        GPLv2
 
 URL:            https://openocd.org
 
+# EPEL8 ships libgpiod 1.4.3, which predates the line request bias flags that
+# the linuxgpiod driver references. configure.ac already detects this
+# (HAVE_LIBGPIOD1_FLAGS_BIAS) but the driver's compatibility macros are not
+# guarded, so it fails to compile; this patch guards them.
+Patch1:         openocd-libgpiod14.patch
+
 BuildRequires:  gcc make libtool git
 BuildRequires:  chrpath libusbx-devel jimtcl-devel >= 0.78
 BuildRequires:  libusb1-devel texinfo libjaylink-devel >= 0.2 libftdi-devel
@@ -24,7 +30,9 @@ BuildRequires:  stlink-devel
 BuildRequires:  sdcc
 %endif
 %if 0%{?epel}
-BuildRequires:  capstone-devel libgpiod-devel < 2
+# libgpiod 1.x in EPEL (1.4.3 on el8, 1.6.3 on el9); the driver also supports
+# the 2.x API, so no artificial upper bound is needed.
+BuildRequires:  capstone-devel libgpiod-devel
 %endif
 %if 0%{?fedora}
 BuildRequires:  capstone-devel
@@ -47,6 +55,7 @@ git clone --depth 1 -n -b %{branch0} %{source0} .
 git fetch --depth 1 origin %{schash0}
 git reset --hard %{schash0}
 git log --format=fuller
+%patch -P 1 -p1 -b .libgpiod14~
 # fix udev rules
 sed -i 's/MODE=.*/TAG+="uaccess"/' contrib/60-openocd.rules
 # fix header

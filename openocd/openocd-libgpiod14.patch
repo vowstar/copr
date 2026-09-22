@@ -1,0 +1,24 @@
+diff --git a/src/jtag/drivers/linuxgpiod.c b/src/jtag/drivers/linuxgpiod.c
+index cc738e9..1d4865d 100644
+--- a/src/jtag/drivers/linuxgpiod.c
++++ b/src/jtag/drivers/linuxgpiod.c
+@@ -35,6 +35,19 @@
+ #define GPIOD_LINE_DRIVE_OPEN_DRAIN     GPIOD_LINE_REQUEST_FLAG_OPEN_DRAIN
+ #define GPIOD_LINE_DRIVE_OPEN_SOURCE    GPIOD_LINE_REQUEST_FLAG_OPEN_SOURCE
+ 
++#ifndef HAVE_LIBGPIOD1_FLAGS_BIAS
++/*
++ * libgpiod < 1.5 has no line request flags for bias. Use private
++ * placeholder values so that gpiod_line_settings_set_bias() below can
++ * still detect (and report as unsupported) bias requests instead of
++ * failing to compile; the placeholders are only ever compared, never
++ * passed to the library (struct gpiod_line_settings.bias stays 0).
++ */
++#define GPIOD_LINE_REQUEST_FLAG_BIAS_DISABLE   0x01000000
++#define GPIOD_LINE_REQUEST_FLAG_BIAS_PULL_UP   0x02000000
++#define GPIOD_LINE_REQUEST_FLAG_BIAS_PULL_DOWN 0x04000000
++#endif
++
+ #define GPIOD_LINE_BIAS_DISABLED        GPIOD_LINE_REQUEST_FLAG_BIAS_DISABLE
+ #define GPIOD_LINE_BIAS_PULL_UP         GPIOD_LINE_REQUEST_FLAG_BIAS_PULL_UP
+ #define GPIOD_LINE_BIAS_PULL_DOWN       GPIOD_LINE_REQUEST_FLAG_BIAS_PULL_DOWN
