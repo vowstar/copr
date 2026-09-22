@@ -42,7 +42,11 @@ if you want to modify the C library or as reference of how it works.
 
 %prep
 %setup -q -n sdcc-%{version}
-#%setup -q -n sdcc
+# NB: there used to be a commented-out "#%%setup -q -n sdcc" line here.  rpm
+# expands -- and for section macros like %%setup even *executes* -- macros inside
+# comments, so on Fedora (rpm 6) it ran a second extraction and then failed with
+# "cd: sdcc: No such file or directory", killing %%prep in every fedora-* chroot
+# while el8/el9 (rpm 4.14/4.16) kept building.  Do not re-add it.
 find -name '*.{c,h,cc}' -a -perm -a=x -exec chmod -a=x '{}' \;
 %patch -P 1 -p1
 # Disable brp-strip-static-archive for now because it errors trying to
