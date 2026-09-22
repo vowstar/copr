@@ -1,5 +1,7 @@
 %global pypi_name cocotb-test
 %global debug_package %{nil}
+# COPR chroots: same set as python3-cocotb (el9 family + fedora-43/44), since
+# this package is useless without cocotb and cocotb is el9-only.
 Name:           python3-%{pypi_name}
 Version:        0.2.6
 Release:        1%{?dist}

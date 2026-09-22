@@ -14,6 +14,15 @@
 # package at all, so 1.3.1's RPM would not be installable.  cocotb only asks for
 # "exceptiongroup" with no minimum, so 1.2.2 satisfies it and has no runtime
 # dependencies of its own.
+#
+# COPR chroots: same set as python3-cocotb (el9 family + fedora-43/44), set via
+#   copr-cli build-package -r epel-9-x86_64 -r rhel-9-x86_64 \
+#     -r centos-stream-9-x86_64 -r centos-stream+epel-next-9-x86_64 \
+#     -r fedora-43-x86_64 -r fedora-44-x86_64 \
+#     --name python3-exceptiongroup vowstar/eda
+# The el8 family is excluded: flit_scm is a PEP 517 backend needing python
+# >= 3.8 and el8's platform python3 is 3.6, so %generate_buildrequires fails
+# there.  This package exists to satisfy cocotb on el9, which is el9-only too.
 
 Name:           python3-exceptiongroup
 Version:        1.2.2
