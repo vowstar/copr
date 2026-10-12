@@ -1,0 +1,69 @@
+;; sshd_forward - let a self-built OpenSSH use every forwarding feature on el8/el9.
+;;
+;; Install: semodule -i sshd_forward.cil      Remove: semodule -r sshd_forward
+;;
+;; Why this exists
+;; ---------------
+;; Upstream 9.8 moved the per-connection work into /usr/libexec/openssh/sshd-session.
+;; el8 and el9 have no sshd_session_t, so that process stays in sshd_t -- a domain
+;; the distribution never had to grant outbound connects to, because 8.0p1/8.7 did
+;; the direct-tcpip connect from the logged-in user's own (unconfined) process.
+;; After upgrading to 10.5p1 therefore every forwarded connection failed:
+;;
+;;   $ ssh -L 5907:127.0.0.1:5907 ice2
+;;   channel 3: open failed: connect failed: open failed
+;;
+;;   avc: denied { name_connect } for comm="sshd-session" dest=5907
+;;     scontext=system_u:system_r:sshd_t:s0-s0:c0.c1023
+;;     tcontext=system_u:object_r:vnc_port_t:s0 tclass=tcp_socket permissive=0
+;;
+;; and X11 (sshd could not stat the xauth helper), agent forwarding (sshd could not
+;; bind the socket in ~/.ssh/agent, logged as
+;; "error: unix_listener_tmp: bind ...") and ProxyJump were broken in the same way.
+;;
+;; Scope
+;; -----
+;; Forwarding and its bookkeeping only: outbound connects, the listening ports a
+;; forwarded display or an administrative "Port" needs, and the sockets sshd
+;; creates for agent/X11.  Nothing here widens file access beyond xauth, and the
+;; port types are named so that a forwarded connection to a service the policy
+;; labels individually still follows this module rather than the whole of
+;; unreserved_port_t.
+;;
+;; Sources: fedora-selinux/selinux-policy#3384 (identical client message, agent
+;; forwarding), #3390 (X11), Red Hat BZ 2523732 (direct-tcpip/ProxyJump to
+;; ssh_port_t).  Verified on Rocky 8 with selinux-policy 3.14.3-139.el8_10.2.
+
+;; ssh -L, ssh -R, ProxyJump, and everything tunnelled over them: any port
+(allow sshd_t port_type (tcp_socket (name_connect)))
+(allow sshd_t unreserved_port_type (tcp_socket (name_connect)))
+(allow sshd_t reserved_port_type (tcp_socket (name_connect)))
+
+;; listening: the display port sshd allocates for ssh -X, and the administrative
+;; spare port a "Port 10023" cutover needs
+(allow sshd_t xserver_port_t (tcp_socket (name_bind)))
+(allow sshd_t unreserved_port_t (tcp_socket (name_bind)))
+(allow sshd_t ephemeral_port_t (tcp_socket (name_bind)))
+
+;; X11 forwarding: sshd publishes a socket beside the real X server's, so
+;; /tmp/.X11-unix holds both.  el8 labels that directory user_tmp_t where an
+;; unconfined X server made the socket and xdm_tmp_t where a confined one did,
+;; so grant both rather than guess which this host has.
+(allow sshd_t xdm_tmp_t (dir (write add_name remove_name search)))
+(allow sshd_t xdm_tmp_t (sock_file (create unlink write)))
+(allow sshd_t user_tmp_t (dir (write add_name remove_name search)))
+(allow sshd_t user_tmp_t (sock_file (create unlink write)))
+
+;; ... and run xauth to register the forwarded display's cookie
+(allow sshd_t xauth_exec_t (file (read open getattr map execute)))
+(allow sshd_t xauth_t (process (transition)))
+(allow sshd_t xauth_t (fd (use)))
+
+;; agent forwarding: the socket sshd creates for the client's agent, under the
+;; user's ~/.ssh/agent (ssh_home_t) or in /tmp/ssh-XXXX -- there is no ssh_tmp_t
+;; in the el8 policy (a module naming one is refused at load time), so that
+;; socket lands in tmp_t and is granted as such
+(allow sshd_t ssh_home_t (dir (write add_name remove_name search)))
+(allow sshd_t ssh_home_t (sock_file (create unlink write)))
+(allow sshd_t tmp_t (dir (write add_name remove_name search)))
+(allow sshd_t tmp_t (sock_file (create unlink write)))

@@ -1,0 +1,60 @@
+;; sshd_forward - the Fedora channel's copy of the el8 module, plus the rules that
+;; must name the separate session domain Fedora's policy introduced.
+;;
+;; Install: semodule -i sshd_forward.cil      Remove: semodule -r sshd_forward
+;;
+;; Same defect and same sources as the el8 file (fedora-selinux/selinux-policy
+;; #3384, #3390, Red Hat BZ 2523732): OpenSSH 9.8 split the per-connection work
+;; into /usr/libexec/openssh/sshd-session, and the policy that followed has not
+;; been granted everything the forwarding features need.  Fedora has
+;; sshd_session_t, where el8 has only sshd_t, and a module naming a type the
+;; policy lacks is refused at load time -- which is why this is a separate file
+;; rather than one file with both sets of rules.
+;;
+;; Scope is the same as the el8 file: forwarding and its bookkeeping only.
+
+;; TCP forwarding in every direction, on any port
+(allow sshd_t port_type (tcp_socket (name_connect)))
+(allow sshd_t unreserved_port_type (tcp_socket (name_connect)))
+(allow sshd_t reserved_port_type (tcp_socket (name_connect)))
+(allow sshd_session_t port_type (tcp_socket (name_connect)))
+(allow sshd_session_t unreserved_port_type (tcp_socket (name_connect)))
+(allow sshd_session_t reserved_port_type (tcp_socket (name_connect)))
+
+;; listening: X11 display ports, and the administrative spare port
+(allow sshd_t xserver_port_t (tcp_socket (name_bind)))
+(allow sshd_t unreserved_port_t (tcp_socket (name_bind)))
+(allow sshd_t ephemeral_port_t (tcp_socket (name_bind)))
+(allow sshd_session_t xserver_port_t (tcp_socket (name_bind)))
+(allow sshd_session_t unreserved_port_t (tcp_socket (name_bind)))
+(allow sshd_session_t ephemeral_port_t (tcp_socket (name_bind)))
+
+;; X11 forwarding: the published socket and the disabled display port beside it
+(allow sshd_t xdm_tmp_t (dir (write add_name remove_name search)))
+(allow sshd_t xdm_tmp_t (sock_file (create unlink write)))
+(allow sshd_t user_tmp_t (dir (write add_name remove_name search)))
+(allow sshd_t user_tmp_t (sock_file (create unlink write)))
+(allow sshd_session_t xdm_tmp_t (dir (write add_name remove_name search)))
+(allow sshd_session_t xdm_tmp_t (sock_file (create unlink write)))
+(allow sshd_session_t user_tmp_t (dir (write add_name remove_name search)))
+(allow sshd_session_t user_tmp_t (sock_file (create unlink write)))
+
+;; ... and the xauth helper that registers the display's cookie
+(allow sshd_t xauth_exec_t (file (read open getattr map execute)))
+(allow sshd_t xauth_t (process (transition)))
+(allow sshd_t xauth_t (fd (use)))
+(allow sshd_session_t xauth_exec_t (file (read open getattr map execute)))
+(allow sshd_session_t xauth_t (process (transition)))
+(allow sshd_session_t xauth_t (fd (use)))
+
+;; agent forwarding: the socket sshd creates under ~/.ssh/agent, or in /tmp --
+;; the policy has no ssh_tmp_t on either channel (a module naming one is refused
+;; at load time, measured on both), so that socket lands in tmp_t
+(allow sshd_t ssh_home_t (dir (write add_name remove_name search)))
+(allow sshd_t ssh_home_t (sock_file (create unlink write)))
+(allow sshd_t tmp_t (dir (write add_name remove_name search)))
+(allow sshd_t tmp_t (sock_file (create unlink write)))
+(allow sshd_session_t ssh_home_t (dir (write add_name remove_name search)))
+(allow sshd_session_t ssh_home_t (sock_file (create unlink write)))
+(allow sshd_session_t tmp_t (dir (write add_name remove_name search)))
+(allow sshd_session_t tmp_t (sock_file (create unlink write)))
