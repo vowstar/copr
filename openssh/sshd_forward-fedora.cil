@@ -11,7 +11,9 @@
 ;; policy lacks is refused at load time -- which is why this is a separate file
 ;; rather than one file with both sets of rules.
 ;;
-;; Scope is the same as the el8 file: forwarding and its bookkeeping only.
+;; Scope is the same as the el8 file: what the 9.8+ split moved into the daemon's
+;; domains (forwarding and its bookkeeping, plus the pam children's two banner
+;; operations) and nothing else.
 
 ;; TCP forwarding in every direction, on any port
 (allow sshd_t port_type (tcp_socket (name_connect)))
@@ -58,3 +60,16 @@
 (allow sshd_session_t ssh_home_t (sock_file (create unlink write)))
 (allow sshd_session_t tmp_t (dir (write add_name remove_name search)))
 (allow sshd_session_t tmp_t (sock_file (create unlink write)))
+
+;; The login banner, the same defect as on el8: pam_exec runs
+;; /usr/local/bin/motd-gen (-> motd-sysinfo) inside whichever of the two daemon
+;; domains the session lives in, and that domain may not exec `ip` -- so the
+;; "IPv4 address for <iface>" lines vanish from the banner and every login logs
+;; two denials (the second is `find /proc -maxdepth 1` stat-ing /proc/irq for the
+;; process count, which ignores the failure).  Both domains are named here
+;; because which one carries the pam children differs between the split's
+;; revisions.  See the el8 file for the measured AVCs.
+(allow sshd_t ifconfig_exec_t (file (read open getattr map execute)))
+(allow sshd_session_t ifconfig_exec_t (file (read open getattr map execute)))
+(allow sshd_t sysctl_irq_t (dir (getattr)))
+(allow sshd_session_t sysctl_irq_t (dir (getattr)))

@@ -43,7 +43,7 @@
 
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        An open source implementation of SSH protocol version 2
 
 License:        BSD-3-Clause AND BSD-2-Clause AND ISC AND SSH-OpenSSH AND ssh-keyscan AND snprintf
@@ -351,6 +351,20 @@ fi
 %attr(0644,root,root) %{_datadir}/selinux/sshd_forward/sshd_forward.cil
 
 %changelog
+* Thu Oct 15 2026 vowstar <vowstar@gmail.com> - 10.5p1-12
+- Let the pam_exec login scripts of a 10.5 build run inside sshd_t too.  The
+  same move that broke forwarding also put every pam session child in sshd_t,
+  where 8.0p1 had run it in the logged-in user's unconfined context, so
+  /usr/local/bin/motd-gen -> motd-sysinfo could no longer exec `ip`
+  (ifconfig_exec_t): the "IPv4 address for <iface>" lines silently vanished
+  from the login banner and every login logged 9-22 denials, each one also
+  triggering a setroubleshoot analysis (~460 setroubleshoot lines a minute in
+  the journal, measured on henan-z3compile and ice2 on 2026-10-15).  The module
+  gains execute+execute_no_trans on ifconfig_exec_t -- no transition, because
+  el8's policy has no type_transition reaching ifconfig_t and declaring one
+  here would collide the day the policy grows its own -- plus getattr on the
+  /proc/irq directory, which `find /proc -maxdepth 1` stats while counting
+  processes and ignores when it fails.
 * Mon Oct 12 2026 vowstar <vowstar@gmail.com> - 10.5p1-11
 - Build with --with-xauth=/usr/bin/xauth.  Upstream's configure default is the
   long dead /usr/X11R6/bin/xauth, and neither this spec nor the Red Hat
@@ -374,7 +388,10 @@ fi
   (logged as "error: unix_listener_tmp: bind ...").  The module grants
   forwarding and its bookkeeping -- outbound connects to any port, the listening
   ports a forwarded display or an administrative Port needs, the agent/X11
-  sockets, and the xauth helper exec.  Same class of bug as
+  sockets, and the xauth helper exec -- plus the two operations the pam_exec
+  children need for the login banner (exec of `ip`, and a stat of /proc/irq
+  while counting processes), which the same move confined to sshd_t in 10.5p1-12.
+  Same class of bug as
   fedora-selinux/selinux-policy#3384, #3390 and Red Hat BZ 2523732.
 - The module is CIL compiled by semodule at install time rather than a
   pre-built .pp: one file then serves every policy variant (targeted, mls,

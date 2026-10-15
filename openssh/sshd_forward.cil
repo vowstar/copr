@@ -23,12 +23,14 @@
 ;;
 ;; Scope
 ;; -----
-;; Forwarding and its bookkeeping only: outbound connects, the listening ports a
-;; forwarded display or an administrative "Port" needs, and the sockets sshd
-;; creates for agent/X11.  Nothing here widens file access beyond xauth, and the
-;; port types are named so that a forwarded connection to a service the policy
-;; labels individually still follows this module rather than the whole of
-;; unreserved_port_t.
+;; What the 9.8/10.x split moved out of the logged-in user's unconfined context
+;; into sshd_t, and nothing else: forwarding and its bookkeeping (outbound
+;; connects, the listening ports a forwarded display or an administrative "Port"
+;; needs, the sockets sshd creates for agent/X11), plus the two operations the
+;; pam_exec children need to render the login banner.  Nothing here widens file
+;; access beyond xauth and `ip`, and the port types are named so that a forwarded
+;; connection to a service the policy labels individually still follows this
+;; module rather than the whole of unreserved_port_t.
 ;;
 ;; Sources: fedora-selinux/selinux-policy#3384 (identical client message, agent
 ;; forwarding), #3390 (X11), Red Hat BZ 2523732 (direct-tcpip/ProxyJump to
@@ -67,3 +69,32 @@
 (allow sshd_t ssh_home_t (sock_file (create unlink write)))
 (allow sshd_t tmp_t (dir (write add_name remove_name search)))
 (allow sshd_t tmp_t (sock_file (create unlink write)))
+
+;; The login banner.  pam_exec runs /usr/local/bin/motd-gen (which calls
+;; motd-sysinfo) as a child of sshd, so from 9.8 on that script is confined to
+;; sshd_t as well -- 8.0p1 ran the whole pam session in the logged-in user's
+;; unconfined context.  Two of its operations are refused there, once per login:
+;;
+;;   avc: denied { execute } for comm="motd-sysinfo" name="ip"
+;;     tcontext=system_u:object_r:ifconfig_exec_t:s0 tclass=file permissive=0
+;;     -> the "IPv4 address for <iface>" lines silently vanish from the banner
+;;
+;;   avc: denied { getattr } for comm="find" path="/proc/irq"
+;;     tcontext=system_u:object_r:sysctl_irq_t:s0 tclass=dir permissive=0
+;;     -> cosmetic: `find /proc -maxdepth 1` stats every child of /proc for the
+;;        process count and ignores the failure; granted so the log stays clean
+;;
+;; Measured on henan-z3compile and ice2 with openssh-10.5p1-11.el8 (2026-10-15):
+;; 9-22 denials per login, each one also triggering a setroubleshoot analysis.
+;; ifconfig_exec_t is the type of `ip`/`ifconfig`/`route` and everything else
+;; that reconfigures an interface; sshd_t runs as root already, so this restores
+;; what the unconfined pam child had and adds nothing the daemon gained by 9.8.
+;;
+;; execute_no_trans, not a transition: the stock policy has no type_transition
+;; reaching ifconfig_t, and declaring one here would collide with the modelled
+;; policy the day it grows its own (CIL type_transition rules are exclusive,
+;; allows are not).  `ip` therefore runs in sshd_t and needs the netlink route
+;; socket that reading addresses requires -- read side only, no nlmsg_write, so
+;; this cannot change an interface.
+(allow sshd_t ifconfig_exec_t (file (read open getattr map execute execute_no_trans)))
+(allow sshd_t sysctl_irq_t (dir (getattr)))
