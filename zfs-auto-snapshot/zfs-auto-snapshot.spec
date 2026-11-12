@@ -2,7 +2,7 @@
 
 Name:		zfs-auto-snapshot
 Version:	1.2.4
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	ZFS Automatic Snapshot Service for Linux
 
 Group:		Applications/System
@@ -43,13 +43,16 @@ sed -i s@/usr/local@/usr@ Makefile
 
 
 %files
-%{_sysconfdir}/cron.d/zfs-auto-snapshot
-%{_sysconfdir}/cron.hourly/zfs-auto-snapshot
-%{_sysconfdir}/cron.daily/zfs-auto-snapshot
-%{_sysconfdir}/cron.weekly/zfs-auto-snapshot
-%{_sysconfdir}/cron.monthly/zfs-auto-snapshot
+%config(noreplace) %{_sysconfdir}/cron.d/zfs-auto-snapshot
+%config(noreplace) %{_sysconfdir}/cron.hourly/zfs-auto-snapshot
+%config(noreplace) %{_sysconfdir}/cron.daily/zfs-auto-snapshot
+%config(noreplace) %{_sysconfdir}/cron.weekly/zfs-auto-snapshot
+%config(noreplace) %{_sysconfdir}/cron.monthly/zfs-auto-snapshot
 %{_mandir}/man8/zfs-auto-snapshot.8.gz
 %{_sbindir}/zfs-auto-snapshot
 
 
 %changelog
+* Thu Nov 12 2026 Huang Rui <vowstar@gmail.com> - 1.2.4-2
+- Mark cron files as %config(noreplace) so local snapshot-retention edits
+  survive package upgrades.
